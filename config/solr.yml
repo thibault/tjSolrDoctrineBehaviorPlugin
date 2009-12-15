@@ -1,4 +1,12 @@
-solr:
+# Can be overriden at application level
+# Prefix : solr_
+
+all:
+  # Connexion configuration
+  host: 'localhost'
+  port: 8983
+  path: '/solr'
+
   fields:
     types:
       clob: text
