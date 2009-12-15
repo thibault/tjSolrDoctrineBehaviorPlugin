@@ -1,0 +1,5 @@
+solr:
+  fields:
+    types:
+      clob: text
+      integer: int

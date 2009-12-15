@@ -13,7 +13,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
   public function setTableDefinition()
   {
-    $this->addListener(new SolrTemplateListener($this->_options));
+    $this->addListener(new Doctrine_Template_Listener_Solr($this->_options));
   }
 
   public function setUp()
