@@ -8,7 +8,8 @@ class Doctrine_Template_Solr extends Doctrine_Template
     'host' => 'localhost',
     'port' => '8983',
     'path' => '/solr',
-    'key' => 'id'
+    'key' => 'id',
+    'fields' => array()
   );
 
   public function setTableDefinition()

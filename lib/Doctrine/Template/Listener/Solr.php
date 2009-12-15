@@ -29,11 +29,9 @@ class Doctrine_Template_Listener_Solr extends Doctrine_Record_Listener
 
     foreach($columns as $column => $attributes)
     {
-      if(!in_array($column, $this->_options['exclude']))
+      if(in_array($column, $this->_options['fields']))
       {
         $columnType = $attributes['type'];
-        var_dump($column);
-        var_dump($columnType);
       }
     }
   }
