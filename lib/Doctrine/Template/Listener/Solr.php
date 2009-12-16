@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Update Solr index when object is created / updated / deleted
+ *
+ * @package     tjSolrDoctrineBehaviorPlugin
+ * @subpackage  Listener
+ * @author      Thibault Jouannic <thibault@jouannic.fr>
+ **/
 class Doctrine_Template_Listener_Solr extends Doctrine_Record_Listener
 {
   protected $_options;

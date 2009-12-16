@@ -1,6 +1,10 @@
 <?php
 /**
  * Searchable via Solr template
+ *
+ * @package     tjSolrDoctrineBehaviorPlugin
+ * @subpackage  Template
+ * @author      Thibault Jouannic <thibault@jouannic.fr>
  **/
 class Doctrine_Template_Solr extends Doctrine_Template
 {
