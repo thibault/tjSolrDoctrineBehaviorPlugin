@@ -1,0 +1,34 @@
+# tjSolrDoctrineBehaviorPlugin (sf1.3/1.4) #
+
+The `tjSolrDoctrineBehaviorPlugin` provides a Doctrine behavior to easily index and search model objects
+in the Solr search engine.
+
+## Installation ##
+
+## Testing the plugin ##
+
+This plugins comes with an auto-generated (with the `sfTaskExtraPlugin`) fixtures project, to run the tests
+without touching your own app.
+
+Here's how you can easily run the plugin test suite :
+
+  * Setup the database for testing
+
+        We've provided a dummy test environment called `solr_doctrine_behavior_test`, so you can
+        run the plugin's tests in a totally independant db.
+
+        To do this, you have to create a new database :
+    
+        mysql> CREATE DATABASE solr_doctrine_behavior_test;
+        mysql> GRANT ALL ON solr_doctrine_behavior_test.* TO test;
+
+    If you want to use an existing test env, skip this part, and replace the next **--env=solr_doctrine_behavior_test**
+    statements with your own env.
+
+  * export the SYMFONY shell var to the symfony lib path. Example :
+
+        $ export SYMFONY='/var/www/myproject/lib/vendor/symfony-1.4.1/lib/'
+
+  * build the bootstrap project and load the default fixtures
+
+        $ php plugins/tjSolrDoctrineBehaviorPlugin/test/fixtures/project/symfony doctrine:build --env=solr_doctrine_behavior_test --all --and-load

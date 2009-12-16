@@ -1,0 +1,7 @@
+solr_doctrine_behavior_test:
+  doctrine:
+    class: sfDoctrineDatabase
+    param:
+      dsn: 'mysql:host=localhost;dbname=solr_doctrine_behavior_test'
+      username: test
+      password: null

@@ -1,0 +1,11 @@
+Thread:
+  thread1:
+    title: Test Thread
+    Posts:
+      post1:
+        title: Here's my post title
+        body: This is the body of my test thread
+#      post2:
+#        body: This is really cool
+#      post3:
+#        body: Ya it is pretty cool
