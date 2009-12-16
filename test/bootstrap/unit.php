@@ -28,3 +28,5 @@ else
 {
   $plugin_configuration = new sfPluginConfigurationGeneric($configuration, dirname(__FILE__).'/../..', 'tjSolrDoctrineBehaviorPlugin');
 }
+//$configuration = ProjectConfiguration::getApplicationConfiguration($app, 'test', isset($debug) ? $debug : true);
+//sfContext::createInstance($configuration);

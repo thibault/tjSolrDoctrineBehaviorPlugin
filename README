@@ -18,7 +18,7 @@ Here's how you can easily run the plugin test suite :
         run the plugin's tests in a totally independant db.
 
         To do this, you have to create a new database :
-    
+
         mysql> CREATE DATABASE solr_doctrine_behavior_test;
         mysql> GRANT ALL ON solr_doctrine_behavior_test.* TO test;
 
@@ -32,3 +32,7 @@ Here's how you can easily run the plugin test suite :
   * build the bootstrap project and load the default fixtures
 
         $ php plugins/tjSolrDoctrineBehaviorPlugin/test/fixtures/project/symfony doctrine:build --env=solr_doctrine_behavior_test --all --and-load
+
+  * run the tests
+
+        $ php symfony test:plugin tjSolrDoctrineBehaviorPlugin
