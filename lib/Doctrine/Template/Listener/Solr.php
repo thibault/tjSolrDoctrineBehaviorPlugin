@@ -18,18 +18,18 @@ class Doctrine_Template_Listener_Solr extends Doctrine_Record_Listener
 
   public function postInsert(Doctrine_Event $event)
   {
-    $this->performIndex($event);
+    $this->updateIndex($event);
   }
 
   public function postUpdate(Doctrine_Event $event)
   {
-    $this->performIndex($event);
+    $this->updateIndex($event);
   }
 
   /**
    * Index invoker fields into Solr
    **/
-  protected function performIndex($event)
+  protected function updateIndex($event)
   {
     $invoker = $event->getInvoker();
     $columns = $invoker->getTable()->getColumns();
