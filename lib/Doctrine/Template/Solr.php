@@ -16,6 +16,8 @@ class Doctrine_Template_Solr extends Doctrine_Template
     'fields' => array()
   );
 
+  protected static $solr;
+
   public function setTableDefinition()
   {
     $this->addListener(new Doctrine_Template_Listener_Solr($this->_options));
@@ -23,5 +25,14 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
   public function setUp()
   {
+    $solr = new Apache_Solr_Service($this->_options['host'],
+                                    $this->_options['port'],
+                                    $this->_options['path']
+    );
+  }
+
+  public function isSearchAvailableTableProxy()
+  {
+    return false;
   }
 }

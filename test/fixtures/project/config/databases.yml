@@ -1,4 +1,4 @@
-solr_doctrine_behavior_test:
+test:
   doctrine:
     class: sfDoctrineDatabase
     param:
