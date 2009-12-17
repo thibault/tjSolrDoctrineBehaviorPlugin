@@ -25,14 +25,25 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
   public function setUp()
   {
-    $solr = new Apache_Solr_Service($this->_options['host'],
-                                    $this->_options['port'],
-                                    $this->_options['path']
-    );
+  }
+
+  protected function getSolrService()
+  {
+    static $solr;
+
+    if(null === $solr)
+    {
+      $solr = new Apache_Solr_Service($this->_options['host'],
+                                      $this->_options['port'],
+                                      $this->_options['path']
+      );
+    }
+
+    return $solr;
   }
 
   public function isSearchAvailableTableProxy()
   {
-    return false;
+    return $this->getSolrService()->ping();
   }
 }
