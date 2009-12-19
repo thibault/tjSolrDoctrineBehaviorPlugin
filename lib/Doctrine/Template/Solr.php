@@ -1,6 +1,7 @@
 <?php
 /**
  * Searchable via Solr template
+ * We're using some classes from the Search components, from the eZ Components
  *
  * @package     tjSolrDoctrineBehaviorPlugin
  * @subpackage  Template
@@ -29,6 +30,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
   /**
     * Returns a solr connexion handler
+    *
     * @return ezcSearchSolrHandler
    **/
   protected function getSolrService()
