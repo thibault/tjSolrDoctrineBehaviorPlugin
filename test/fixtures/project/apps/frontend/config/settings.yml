@@ -21,6 +21,7 @@ test:
     web_debug:              false
     no_script_name:         false
     etag:                   false
+    logging_enabled:        true
 
 all:
   .settings:
