@@ -27,23 +27,44 @@ class Doctrine_Template_Solr extends Doctrine_Template
   {
   }
 
+  /**
+    * Returns a solr connexion handler
+    * @return ezcSearchSolrHandler
+   **/
   protected function getSolrService()
   {
     static $solr;
 
     if(null === $solr)
     {
-      $solr = new Apache_Solr_Service($this->_options['host'],
-                                      $this->_options['port'],
-                                      $this->_options['path']
-      );
+      try
+      {
+        $solr = new ezcSearchSolrHandler($this->_options['host'],
+                                        $this->_options['port'],
+                                        $this->_options['path']
+        );
+      }
+      catch(Exception $e)
+      {
+        sfContext::getInstance()->getLogger()->warning('{tjSolrDoctrineBehaviorPlugin} ' . $e->getMessage());
+      }
     }
 
     return $solr;
   }
 
+  /**
+    * Return true if the solr handler is available and connected
+   **/
   public function isSearchAvailableTableProxy()
   {
-    return $this->getSolrService()->ping();
+    return $this->getSolrService() !== null;
+  }
+
+  /**
+   * Performs a research through Solr
+   **/
+  public function searchTableProxy()
+  {
   }
 }
