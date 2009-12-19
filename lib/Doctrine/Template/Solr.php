@@ -33,7 +33,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
     *
     * @return ezcSearchSolrHandler
    **/
-  protected function getSolrService()
+  public function getSolrService()
   {
     static $solr;
 
@@ -64,9 +64,26 @@ class Doctrine_Template_Solr extends Doctrine_Template
   }
 
   /**
+    * Computes a default document definition
+    *
+    * @return ezcSearchDocumentDefinition
+   **/
+  public function getDocumentDefinition()
+  {
+    $def = new ezcSearchDocumentDefinition(__CLASS__);
+    $def->idProperty = 'id';
+    $def->fields['id'] = new ezcSearchDefinitionDocumentField('id', ezcSearchDocumentDefinition::TEXT);
+    $def->fields['title'] = new ezcSearchDefinitionDocumentField( 'title', ezcSearchDocumentDefinition::TEXT, 2, true, false, true);
+    $def->fields['body'] = new ezcSearchDefinitionDocumentField( 'body', ezcSearchDocumentDefinition::TEXT, 1, false, false, false);
+
+    return $def;
+  }
+
+  /**
    * Performs a research through Solr
    **/
   public function searchTableProxy()
   {
+    return array();
   }
 }

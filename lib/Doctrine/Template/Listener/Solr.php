@@ -32,14 +32,12 @@ class Doctrine_Template_Listener_Solr extends Doctrine_Record_Listener
   protected function updateIndex($event)
   {
     $invoker = $event->getInvoker();
-    $columns = $invoker->getTable()->getColumns();
+    $solrHandler = $invoker->getSolrService();
 
-    foreach($columns as $column => $attributes)
-    {
-      if(in_array($column, $this->_options['fields']))
-      {
-        $columnType = $attributes['type'];
-      }
-    }
+    // Delete the doc from index if it already exists
+    if(!$invoker->isNew())
+      $solrHandler->deleteById($invoker->getId(), $invoker->getDocumentDefinition());
+
+    $solrHandler->index($invoker->getDocumentDefinition(), $invoker);
   }
 }
