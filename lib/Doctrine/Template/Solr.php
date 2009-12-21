@@ -70,7 +70,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function getDocumentDefinition()
   {
-    $def = new ezcSearchDocumentDefinition(__CLASS__);
+    $def = new ezcSearchDocumentDefinition(get_class($this->getInvoker()));
     $def->idProperty = 'id';
     $def->fields['id'] = new ezcSearchDefinitionDocumentField('id', ezcSearchDocumentDefinition::TEXT);
     $def->fields['title'] = new ezcSearchDefinitionDocumentField( 'title', ezcSearchDocumentDefinition::TEXT, 2, true, false, true);
@@ -82,8 +82,38 @@ class Doctrine_Template_Solr extends Doctrine_Template
   /**
    * Performs a research through Solr
    **/
-  public function searchTableProxy()
+  public function searchTableProxy($search)
   {
-    return array();
+    $solr = $this->getSolrService();
+    $def = $this->getDocumentDefinition();
+
+    // We add the ezcsearch_type field to the definition automatically here, but we delete it as well
+    // see ezcSearchSession
+    $def->fields['ezcsearch_type'] = new ezcSearchDefinitionDocumentField('ezcsearch_type', ezcSearchDocumentDefinition::STRING);
+    $query = $solr->createFindQuery(get_class($this->getInvoker()), $def);
+    unset($def->fields['ezcsearch_type']);
+
+    // Use eZ Components to parse a query string
+    $qb = new ezcSearchQueryBuilder();
+    $qb->parseSearchQuery($query, $search, array_keys($def->fields));
+
+    try
+    {
+      $queryWord = join( ' AND ', $query->whereClauses );
+      $resultFieldList = $query->resultFields;
+      $highlightFieldList = $query->highlightFields;
+      $facetFieldList = $query->facets;
+      $limit = $query->limit;
+      $offset = $query->offset;
+      $order = $query->orderByClauses;
+      $results = $solr->search( $queryWord, '', array(), $resultFieldList, $highlightFieldList, $facetFieldList, $limit, $offset, $order );
+    }
+    catch(Exception $e)
+    {
+      sfContext::getInstance()->getLogger()->warning('{tjSolrDoctrineBehaviorPlugin} ' . $e->getMessage());
+    }
+
+    var_dump($results);
+    return $results;
   }
 }
