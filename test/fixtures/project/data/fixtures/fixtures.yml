@@ -3,9 +3,10 @@ Thread:
     title: Test Thread
     Posts:
       post1:
-        title: Here's my post title
+        title: This is a gloubigoulba title
         body: This is the body of my test thread
-#      post2:
-#        body: This is really cool
-#      post3:
-#        body: Ya it is pretty cool
+
+
+      post2:
+        title: Another useless post
+        body: This is a gloubigoulba body
