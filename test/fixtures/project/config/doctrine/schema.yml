@@ -8,7 +8,7 @@ Post:
   actAs:
     Solr:
       fields: [ title, body ]
-      fieldmap: { title: title_t }
+      fieldmap: { title: title_t, body: body_t }
       boost: { title: 2 }
 
   columns:

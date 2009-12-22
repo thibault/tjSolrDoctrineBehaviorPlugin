@@ -12,7 +12,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
     'host' => 'localhost',
     'port' => '8983',
     'path' => '/solr',
-    'key' => 'id',
+    'key' => 'sf_unique_id',
     'fields' => array(),
     'fieldmap' => array(),
     'boost' => array()
@@ -78,13 +78,17 @@ class Doctrine_Template_Solr extends Doctrine_Template
     // Set document key
     $document->addField($this->_options['key'], $this->getSolrId());
 
+    // set meta data
+    $document->addField('sf_meta_class', get_class($invoker));
+    $document->addField('sf_meta_id', $invoker->getId());
+
     // Set others fields
     $fields = $this->_options['fields'];
     $map = $this->_options['fieldmap'];
     $boost = $this->_options['boost'];
     foreach($fields as $field)
     {
-      $solrName = $map[$field] ? $map[$field] : $field;
+      $fieldName = $map[$field] ? $map[$field] : $field;
       $boost = $boost[$field] ? $boost[$field] : 1;
 
       $value = $invoker->get($field);
@@ -93,10 +97,22 @@ class Doctrine_Template_Solr extends Doctrine_Template
       if(!is_array($value))
         $value = array($value);
 
-      $document->setField($fieldName, $fieldValue, $boost);
+      $document->setField($fieldName, $value, $boost);
     }
 
     return $document;
+  }
+
+  /**
+    * Remove every indexed documents
+    *
+    * handle with care
+   **/
+  public function deleteIndexTableProxy()
+  {
+    $solr = $this->getSolrService();
+    $solr->deleteByQuery('*:*');
+    $solr->commit();
   }
 
   /**
@@ -104,5 +120,10 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function searchTableProxy($search)
   {
+    $solr = $this->getSolrService();
+    $results = $solr->search($search);
+    $response = json_decode($results->getRawResponse());
+
+    return $response->response;
   }
 }

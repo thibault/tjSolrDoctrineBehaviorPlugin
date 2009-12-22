@@ -61,6 +61,7 @@ abstract class BasePost extends sfDoctrineRecord
              'fieldmap' => 
              array(
               'title' => 'title_t',
+              'body' => 'body_t',
              ),
              'boost' => 
              array(
