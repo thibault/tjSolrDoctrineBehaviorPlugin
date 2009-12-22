@@ -117,6 +117,8 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
   /**
    * Performs a research through Solr
+   *
+   * @return array The solr response as a php array
    **/
   public function searchTableProxy($search)
   {
