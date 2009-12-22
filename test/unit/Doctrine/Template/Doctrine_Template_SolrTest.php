@@ -72,3 +72,21 @@ $otherPost->save();
 $results = Doctrine::getTable('Post')->search('azerty');
 $t->is($results->numFound, 2,
   '::search() words are found in every fields');
+
+$t->comment('-> Creating tests objects. Please be patient');
+for($i = 0 ; $i < 30 ; $i++)
+{
+  $post = new Post();
+  $post->title = "tototututata $i";
+  $post->body = '';
+  $post->Thread = $otherPost->Thread;
+  $post->save();
+}
+$results = Doctrine::getTable('Post')->search('tototututata', 3, 13);
+$t->is($results->numFound, 30,
+  '::search() "numFound" is correct even with "limit" set');
+$t->is($results->start, 3,
+  '::search() "start" has the correct value');
+$t->is(count($results->docs), 13,
+  '::search() the "limit" parameter is taken into account');
+
