@@ -13,7 +13,9 @@ class Doctrine_Template_Solr extends Doctrine_Template
     'port' => '8983',
     'path' => '/solr',
     'key' => 'id',
-    'fields' => array()
+    'fields' => array(),
+    'fieldmap' => array(),
+    'boost' => array()
   );
 
   protected static $solr;
@@ -78,25 +80,20 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
     // Set others fields
     $fields = $this->_options['fields'];
-    foreach($fields as $field => $data)
+    $map = $this->_options['fieldmap'];
+    $boost = $this->_options['boost'];
+    foreach($fields as $field)
     {
-      if(is_array($data))
-      {
-        $solrName = $data['name'] ? $data['name'] : $field;
-        $boost = $data['boost'] ? $data['boost'] : 1;
-      }
-      else
-      {
-        $solrName = $data;
-        $boost = 1;
-      }
+      $solrName = $map[$field] ? $map[$field] : $field;
+      $boost = $boost[$field] ? $boost[$field] : 1;
 
       $value = $invoker->get($field);
+
+      // Solr_Apache_Document always expect an array
       if(!is_array($value))
         $value = array($value);
 
-      foreach($value as $fieldValue)
-        $document->setField($fieldName, $fieldValue, $boost);
+      $document->setField($fieldName, $fieldValue, $boost);
     }
 
     return $document;

@@ -7,11 +7,9 @@ Thread:
 Post:
   actAs:
     Solr:
-      fields:
-        title:
-          name: title_t
-          boost: 2
-        body: body_t
+      fields: [ title, body ]
+      fieldmap: { title: title_t }
+      boost: { title: 2 }
 
   columns:
     thread_id:
