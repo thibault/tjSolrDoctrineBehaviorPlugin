@@ -66,6 +66,30 @@ class Doctrine_Template_Solr extends Doctrine_Template
   }
 
   /**
+   * Index the invoker into Solr
+   **/
+  public function addToIndex()
+  {
+    $invoker = $this->getInvoker();
+    $solr = $invoker->getSolrService();
+
+    $solr->addDocument($invoker->getSolrDocument());
+    $solr->commit();
+  }
+
+  /**
+   * Delete the invoker from index
+   **/
+  public function deleteFromIndex()
+  {
+    $invoker = $this->getInvoker();
+    $solr = $invoker->getSolrService();
+
+    $solr->deleteById($invoker->getSolrId());
+    $solr->commit();
+  }
+
+  /**
     * Build a Document for Solr indexing
     *
     * @return Apache_Solr_Document

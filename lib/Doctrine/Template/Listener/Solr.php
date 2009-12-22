@@ -26,19 +26,24 @@ class Doctrine_Template_Listener_Solr extends Doctrine_Record_Listener
     $this->updateIndex($event);
   }
 
+  public function preDelete(Doctrine_Event $event)
+  {
+    $invoker = $event->getInvoker();
+
+    $invoker->deleteFromIndex();
+  }
+
   /**
    * Index invoker fields into Solr
    **/
   protected function updateIndex($event)
   {
     $invoker = $event->getInvoker();
-    $solr = $invoker->getSolrService();
 
     // Delete the doc from index if it already exists
     if(!$invoker->isNew())
-      $solr->deleteById($invoker->getSolrId());
+      $invoker->deleteFromIndex();
 
-    $solr->addDocument($invoker->getSolrDocument());
-    $solr->commit();
+    $invoker->addToIndex();
   }
 }
