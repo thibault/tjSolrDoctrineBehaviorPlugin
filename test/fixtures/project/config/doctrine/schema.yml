@@ -7,7 +7,12 @@ Thread:
 Post:
   actAs:
     Solr:
-      fields: [ title, body ]
+      fields:
+        title:
+          name: title_t
+          boost: 2
+        body: body_t
+
   columns:
     thread_id:
       type: integer

@@ -1,7 +1,6 @@
 <?php
 /**
  * Searchable via Solr template
- * We're using some classes from the Search components, from the eZ Components
  *
  * @package     tjSolrDoctrineBehaviorPlugin
  * @subpackage  Template
@@ -31,7 +30,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
   /**
     * Returns a solr connexion handler
     *
-    * @return ezcSearchSolrHandler
+    * @return Apache_Solr_Service
    **/
   public function getSolrService()
   {
@@ -39,17 +38,10 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
     if(null === $solr)
     {
-      try
-      {
-        $solr = new ezcSearchSolrHandler($this->_options['host'],
-                                        $this->_options['port'],
-                                        $this->_options['path']
-        );
-      }
-      catch(Exception $e)
-      {
-        sfContext::getInstance()->getLogger()->warning('{tjSolrDoctrineBehaviorPlugin} ' . $e->getMessage());
-      }
+      $solr = new Apache_Solr_Service($this->_options['host'],
+                                      $this->_options['port'],
+                                      $this->_options['path']
+      );
     }
 
     return $solr;
@@ -60,23 +52,54 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function isSearchAvailableTableProxy()
   {
-    return $this->getSolrService() !== null;
+    return $this->getSolrService()->ping();
   }
 
   /**
-    * Computes a default document definition
-    *
-    * @return ezcSearchDocumentDefinition
+   * Get a unique solr document identifier
    **/
-  public function getDocumentDefinition()
+  public function getSolrId()
   {
-    $def = new ezcSearchDocumentDefinition(get_class($this->getInvoker()));
-    $def->idProperty = 'id';
-    $def->fields['id'] = new ezcSearchDefinitionDocumentField('id', ezcSearchDocumentDefinition::TEXT);
-    $def->fields['title'] = new ezcSearchDefinitionDocumentField( 'title', ezcSearchDocumentDefinition::TEXT, 2, true, false, true);
-    $def->fields['body'] = new ezcSearchDefinitionDocumentField( 'body', ezcSearchDocumentDefinition::TEXT, 1, false, false, false);
+    return sprintf('%s_%s', get_class($this->getInvoker()), $this->getInvoker()->getId());
+  }
 
-    return $def;
+  /**
+    * Build a Document for Solr indexing
+    *
+    * @return Apache_Solr_Document
+   **/
+  public function getSolrDocument()
+  {
+    $document = new Apache_Solr_Document();
+    $invoker = $this->getInvoker();
+
+    // Set document key
+    $document->addField($this->_options['key'], $this->getSolrId());
+
+    // Set others fields
+    $fields = $this->_options['fields'];
+    foreach($fields as $field => $data)
+    {
+      if(is_array($data))
+      {
+        $solrName = $data['name'] ? $data['name'] : $field;
+        $boost = $data['boost'] ? $data['boost'] : 1;
+      }
+      else
+      {
+        $solrName = $data;
+        $boost = 1;
+      }
+
+      $value = $invoker->get($field);
+      if(!is_array($value))
+        $value = array($value);
+
+      foreach($value as $fieldValue)
+        $document->setField($fieldName, $fieldValue, $boost);
+    }
+
+    return $document;
   }
 
   /**
@@ -84,36 +107,5 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function searchTableProxy($search)
   {
-    $solr = $this->getSolrService();
-    $def = $this->getDocumentDefinition();
-
-    // We add the ezcsearch_type field to the definition automatically here, but we delete it as well
-    // see ezcSearchSession
-    $def->fields['ezcsearch_type'] = new ezcSearchDefinitionDocumentField('ezcsearch_type', ezcSearchDocumentDefinition::STRING);
-    $query = $solr->createFindQuery(get_class($this->getInvoker()), $def);
-    unset($def->fields['ezcsearch_type']);
-
-    // Use eZ Components to parse a query string
-    $qb = new ezcSearchQueryBuilder();
-    $qb->parseSearchQuery($query, $search, array_keys($def->fields));
-
-    try
-    {
-      $queryWord = join( ' AND ', $query->whereClauses );
-      $resultFieldList = $query->resultFields;
-      $highlightFieldList = $query->highlightFields;
-      $facetFieldList = $query->facets;
-      $limit = $query->limit;
-      $offset = $query->offset;
-      $order = $query->orderByClauses;
-      $results = $solr->search( $queryWord, '', array(), $resultFieldList, $highlightFieldList, $facetFieldList, $limit, $offset, $order );
-    }
-    catch(Exception $e)
-    {
-      sfContext::getInstance()->getLogger()->warning('{tjSolrDoctrineBehaviorPlugin} ' . $e->getMessage());
-    }
-
-    var_dump($results);
-    return $results;
   }
 }

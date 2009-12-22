@@ -55,8 +55,12 @@ abstract class BasePost extends sfDoctrineRecord
         $solr0 = new Doctrine_Template_Solr(array(
              'fields' => 
              array(
-              0 => 'title',
-              1 => 'body',
+              'title' => 
+              array(
+              'name' => 'title_t',
+              'boost' => 2,
+              ),
+              'body' => 'body_t',
              ),
              ));
         $this->actAs($solr0);
