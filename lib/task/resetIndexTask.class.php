@@ -6,7 +6,7 @@
  * @package tjSolrDoctrineBehaviorPlugin
  * @subpackage task
  * @author Marc Weistroff <mweistroff@uneviemoinschere.com>
- * @author Thibault Jouanni <thibault@jouannic.fr>
+ * @author Thibault Jouannic <thibault@jouannic.fr>
  */
 class resetIndexTask extends sfBaseTask
 {
@@ -17,7 +17,7 @@ class resetIndexTask extends sfBaseTask
   {
     // add your own arguments here
     $this->addArguments(array(
-      // We need a model class to have the connexion parameters  
+      // We need a model class to have the connexion parameters
       new sfCommandArgument('model', sfCommandArgument::REQUIRED, 'The model name'),
     ));
 
