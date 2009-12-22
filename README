@@ -10,29 +10,33 @@ in the Solr search engine.
 This plugins comes with an auto-generated (with the `sfTaskExtraPlugin`) fixtures project, to run the tests
 without touching your own app.
 
+Before you run the tests, make sure Solr is running is accessible.
+
 Here's how you can easily run the plugin test suite :
-
-  * Setup the database for testing
-
-        We've provided a dummy test environment called `solr_doctrine_behavior_test`, so you can
-        run the plugin's tests in a totally independant db.
-
-        To do this, you have to create a new database :
-
-        mysql> CREATE DATABASE solr_doctrine_behavior_test;
-        mysql> GRANT ALL ON solr_doctrine_behavior_test.* TO test;
-
-    If you want to use an existing test env, skip this part, and replace the next **--env=solr_doctrine_behavior_test**
-    statements with your own env.
 
   * export the SYMFONY shell var to the symfony lib path. Example :
 
         $ export SYMFONY='/var/www/myproject/lib/vendor/symfony-1.4.1/lib/'
 
-  * build the bootstrap project and load the default fixtures
+  * Setup the database for testing
 
-        $ php plugins/tjSolrDoctrineBehaviorPlugin/test/fixtures/project/symfony doctrine:build --env=solr_doctrine_behavior_test --all --and-load
+    The plugin's tests are made to run against an independant db. You have to create it before anything else.
+
+        mysql> CREATE DATABASE solr_doctrine_behavior_test;
+        mysql> GRANT ALL ON solr_doctrine_behavior_test.* TO test;
+
+    If you want to use an existing database, you have to configure the database connexion by yourself
+
+        $ php plugins/tjSolrDoctrineBehaviorPlugin/test/fixtures/project/symfony configure:database --env=test
+
+  * build the bootstrap project. You don't have to load the fixtures, this will be automatic.
+
+        $ php plugins/tjSolrDoctrineBehaviorPlugin/test/fixtures/project/symfony doctrine:build --env=test --all
 
   * run the tests
 
         $ php symfony test:plugin tjSolrDoctrineBehaviorPlugin
+    
+    or, if the sfTaskExtraPlugin is not installed :
+
+        $ php plugins/tjSolrDoctrineBehaviorPlugin/test/bin/prove.php
