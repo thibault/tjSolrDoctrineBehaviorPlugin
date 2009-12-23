@@ -158,4 +158,37 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
     return $response->response;
   }
+
+  /**
+   * Generate a doctrine query based on a Solr search
+   *
+   * @return Doctrine_Query
+   **/
+  public function createSearchQueryTableProxy($search, $limit = 256)
+  {
+    $response = $this->getTable()->search($search, 0, $limit);
+
+    $pks = array();
+    foreach($response->docs as $doc)
+    {
+      $pks[] = $doc->sf_meta_id;
+    }
+
+    $q = $this->getTable()->createQuery();
+    $alias = $q->getRootAlias();
+
+    if($pks)
+    {
+      $q->whereIn($alias.'.id', $pks);
+      // preserve score order
+      $q->addSelect(sprintf('FIELD(%s.id,%s) as field', $alias, implode(',', $pks)));
+      $q->orderBy('field');
+    }
+    else
+    {
+      $q->whereIn($alias.'.id', -1);
+    }
+
+    return $q;
+  }
 }
