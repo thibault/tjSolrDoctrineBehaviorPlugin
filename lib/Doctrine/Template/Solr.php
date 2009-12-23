@@ -19,6 +19,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
   );
 
   protected static $solr;
+  protected $_inTransaction;
 
   public function setTableDefinition()
   {
@@ -27,6 +28,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
   public function setUp()
   {
+    $this->_inTransaction = 0;
   }
 
   /**
@@ -74,7 +76,9 @@ class Doctrine_Template_Solr extends Doctrine_Template
     $solr = $invoker->getSolrService();
 
     $solr->addDocument($invoker->getSolrDocument());
-    $solr->commit();
+
+    if($this->_inTransaction == 0)
+      $solr->commit();
   }
 
   /**
@@ -86,7 +90,9 @@ class Doctrine_Template_Solr extends Doctrine_Template
     $solr = $invoker->getSolrService();
 
     $solr->deleteById($invoker->getSolrId());
-    $solr->commit();
+
+    if($this->_inTransaction == 0)
+      $solr->commit();
   }
 
   /**
@@ -136,7 +142,9 @@ class Doctrine_Template_Solr extends Doctrine_Template
   {
     $solr = $this->getSolrService();
     $solr->deleteByQuery('*:*');
-    $solr->commit();
+
+    if($this->_inTransaction == 0)
+      $solr->commit();
   }
 
   /**
@@ -190,5 +198,38 @@ class Doctrine_Template_Solr extends Doctrine_Template
     }
 
     return $q;
+  }
+
+  /**
+    * Starts a transaction for indexing
+    *
+    * When using a transaction, the amount of processing that solr does
+    * decreases, increasing indexing performance. Without this, we
+    * sends a commit after every document that is indexed. Transactions can be
+    * nested, when commit() is called the same number of times as
+    * beginTransaction(), we send a commit.
+   **/
+  public function beginTransactionTableProxy()
+  {
+    $this->_inTransaction++;
+  }
+
+  /**
+    * Ends a transaction, and sends a commit message to Solr
+    *
+    * As transactions can be nested, we only send a real commit
+    * when all transactions are closed
+   **/
+  public function commitTableProxy()
+  {
+    if($this->_inTransaction < 1)
+      throw new sfException('Cannot commit when not in transaction');
+
+    $this->_inTransaction--;
+
+    if($this->_inTransaction == 0)
+    {
+      $this->getSolrService()->commit();
+    }
   }
 }
