@@ -147,7 +147,13 @@ class Doctrine_Template_Solr extends Doctrine_Template
   public function searchTableProxy($search, $offset = 0, $limit = 30)
   {
     $solr = $this->getSolrService();
-    $results = $solr->search($search, $offset, $limit);
+
+    // We filter the results types
+    $params = array(
+      'fq' => 'sf_meta_class:'.get_class($this->getInvoker())
+    );
+
+    $results = $solr->search($search, $offset, $limit, $params);
     $response = json_decode($results->getRawResponse());
 
     return $response->response;
