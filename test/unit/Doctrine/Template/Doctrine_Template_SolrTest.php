@@ -5,11 +5,14 @@
  */
 include dirname(__FILE__).'/../../../bootstrap/bootstrap.php';
 
-$t = new lime_test(8);
+$t = new lime_test(15);
 
 // We need access to Solr to run our tests. Ensure it is running
 if(!Doctrine::getTable('Post')->isSearchAvailable())
-  die();
+{
+  $t->error('Solr is unavailable, cannot run tests');
+  return 1;
+}
 
 // Ensure we're working on a clean index
 Doctrine::getTable('Post')->deleteIndex();
@@ -38,7 +41,7 @@ $t->comment('-> addToIndex');
 $post->addToIndex();
 $results = Doctrine::getTable('Post')->search('*:*');
 $t->is($results->numFound, $numResults,
-  '::addFromIndex() correctly adds object to solr');
+  '::addToIndex() correctly adds object to solr');
 
 $t->comment('-> deleteIndex');
 Doctrine::getTable('Post')->deleteIndex();
@@ -72,6 +75,20 @@ $otherPost->save();
 $results = Doctrine::getTable('Post')->search('azerty');
 $t->is($results->numFound, 2,
   '::search() words are found in every fields');
+$t->is($results->docs[0]->sf_meta_id, $post->getId(),
+  '::search() order correct');
+
+$post->title = 'blablabla';
+$post->body = 'azerty';
+$post->save();
+$otherPost->title = 'azerty';
+$otherPost->body = 'blablabla';
+$otherPost->save();
+
+/*$results = Doctrine::getTable('Post')->search('azerty');
+$t->is($results->docs[0]->sf_meta_id, $otherPost->getId(),
+  '::search() boost is taken into account');
+ */
 
 $t->comment('-> Creating tests objects. Please be patient');
 for($i = 0 ; $i < 30 ; $i++)
@@ -90,3 +107,13 @@ $t->is($results->start, 3,
 $t->is(count($results->docs), 13,
   '::search() the "limit" parameter is taken into account');
 
+$t->comment('-> createSearchQuery');
+$q = Doctrine::getTable('Post')->createSearchQuery('azerty');
+$t->ok($q instanceof Doctrine_Query,
+  '::createSearchQuery() returns a "Doctrine_Query" object');
+$t->is($q->count(), 2,
+  '::createSearchQuery() seems to return a valid query');
+
+$q = Doctrine::getTable('Post')->createSearchQuery('tepébotiujdevauieauie');
+$t->is($q->count(), 0,
+  '::createSearchQuery() no results when stupid query');
