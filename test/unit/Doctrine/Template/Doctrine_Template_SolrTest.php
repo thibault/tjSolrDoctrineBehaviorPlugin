@@ -5,7 +5,7 @@
  */
 include dirname(__FILE__).'/../../../bootstrap/bootstrap.php';
 
-$t = new lime_test(15);
+$t = new lime_test(20);
 
 // We need access to Solr to run our tests. Ensure it is running
 if(!Doctrine::getTable('Post')->isSearchAvailable())
@@ -91,7 +91,8 @@ $t->is($results->docs[0]->sf_meta_id, $otherPost->getId(),
  */
 
 $t->comment('-> Creating tests objects. Please be patient');
-for($i = 0 ; $i < 30 ; $i++)
+Doctrine_Core::getTable('Post')->beginTransaction();
+for($i = 0 ; $i < 20 ; $i++)
 {
   $post = new Post();
   $post->title = "tototututata $i";
@@ -99,8 +100,9 @@ for($i = 0 ; $i < 30 ; $i++)
   $post->Thread = $otherPost->Thread;
   $post->save();
 }
+Doctrine_Core::getTable('Post')->commit();
 $results = Doctrine::getTable('Post')->search('tototututata', 3, 13);
-$t->is($results->numFound, 30,
+$t->is($results->numFound, 20,
   '::search() "numFound" is correct even with "limit" set');
 $t->is($results->start, 3,
   '::search() "start" has the correct value');
@@ -117,3 +119,41 @@ $t->is($q->count(), 2,
 $q = Doctrine::getTable('Post')->createSearchQuery('tepébotiujdevauieauie');
 $t->is($q->count(), 0,
   '::createSearchQuery() no results when stupid query');
+
+$t->comment('-> transactions');
+try
+{
+  Doctrine_Core::getTable('Post')->commit();
+  $t->fail('::commit() raise an exception when not in a transaction');
+}
+catch(sfException $e)
+{
+  $t->pass('::commit() raise an exception when not in a transaction');
+}
+Doctrine_Core::getTable('Post')->beginTransaction();
+$post->title = 'glopgloppasglop';
+$post->save();
+$results = Doctrine::getTable('Post')->search('glopgloppasglop');
+$t->is($results->numFound, 0,
+  '::commit() no index modification when uncommited yet');
+
+Doctrine_Core::getTable('Post')->commit();
+$results = Doctrine::getTable('Post')->search('glopgloppasglop');
+$t->is($results->numFound, 1,
+  '::commit() index is modified after commit');
+
+Doctrine_Core::getTable('Post')->beginTransaction();
+Doctrine_Core::getTable('Post')->beginTransaction();
+
+$post->title = 'nothing';
+$post->save();
+Doctrine_Core::getTable('Post')->commit();
+
+$results = Doctrine::getTable('Post')->search('glopgloppasglop');
+$t->is($results->numFound, 1,
+  '::commit() transactions can be nested');
+
+Doctrine_Core::getTable('Post')->commit();
+$results = Doctrine::getTable('Post')->search('glopgloppasglop');
+$t->is($results->numFound, 0,
+  '::commit() only when all transactions ended');
