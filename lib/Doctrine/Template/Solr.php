@@ -118,8 +118,8 @@ class Doctrine_Template_Solr extends Doctrine_Template
     $boost = $this->_options['boost'];
     foreach($fields as $field)
     {
-      $fieldName = $map[$field] ? $map[$field] : $field;
-      $boost = $boost[$field] ? $boost[$field] : 1;
+      $fieldName = array_key_exists($field, $map) ? $map[$field] : $field;
+      $fieldBoost = array_key_exists($field, $boost) ? $boost[$field] : 1;
 
       $value = $invoker->get($field);
 
@@ -127,7 +127,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
       if(!is_array($value))
         $value = array($value);
 
-      $document->setField($fieldName, $value, $boost);
+      $document->setField($fieldName, $value, $fieldBoost);
     }
 
     return $document;
@@ -184,6 +184,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
     $q = $this->getTable()->createQuery();
     $alias = $q->getRootAlias();
+    $q->select($alias.'.*');
 
     if($pks)
     {
