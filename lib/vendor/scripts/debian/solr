@@ -1,0 +1,115 @@
+#!/bin/sh -e
+### BEGIN INIT INFO
+# Provides:          solr
+# Required-Start:    $local_fs $remote_fs $syslog
+# Required-Stop:     $local_fs $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start/stop solr server
+### END INIT INFO
+#
+# Solr init script for debian.
+#
+# Based on the the eZ Find project
+# http://ez.no/ezfind
+#
+# Usage:
+#
+# Set the correct SOLR_HOME value, and copy this file to /etc/init.d
+# Then use update-rc.d
+#
+# Example:
+# cp solr /etc/init.d/solr
+# cd /etc/init.d && chmod 755 solr
+# update-rc.d solr defaults
+
+
+. /lib/lsb/init-functions
+
+NAME=solr
+SOLR_HOME=/usr/local/solr/java
+# Replace with the solr installation path
+
+PARAMETERS="-jar start.jar"
+DAEMON=/usr/bin/java
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Gracefully exit if the package has been removed.
+test -x $DAEMON || exit 0
+
+#
+#	Function that starts the daemon/service.
+#
+d_start() {
+	start-stop-daemon --start --pidfile $PIDFILE --chdir $SOLR_HOME --background --make-pidfile --exec $DAEMON -- $PARAMETERS
+}
+#
+#	Function that stops the daemon/service.
+#
+d_stop() {
+	start-stop-daemon --stop --quiet --pidfile $PIDFILE --name java
+        rm -f $PIDFILE
+}
+
+#
+#	Function that checks if solr is running
+#	Returns success (0) if solr is running, failure (1) if not running
+#
+d_status() {
+    if [ -f "$PIDFILE" ] && ps `cat $PIDFILE` >/dev/null 2>&1; then
+		return 0 # EXIT_SUCCESS
+    else
+	  	return 1 # EXIT_FAILURE
+    fi
+}
+
+case "$1" in
+  start)
+	log_success_msg "Starting $NAME"
+	if d_status; then
+		log_warning_msg "$NAME is already running."
+		return 1
+	fi
+	d_start
+	if d_status; then
+		log_success_msg "done."
+	else
+		log_failure_msg "failed to start solr"
+		exit 1
+	fi
+	;;
+  stop)
+	log_success_msg "Stopping $NAME"
+	if d_status; then
+		d_stop
+		if d_status; then
+			log_failure_msg "$NAME is still running."
+			exit 1
+		else
+			log_success_msg "done."
+		fi
+	else
+		log_warning_msg "$NAME is not running."
+	fi
+	;;
+  status)
+	if d_status; then
+		log_success_msg "$NAME is running (PID: `cat $PIDFILE`)"
+	else
+		log_success_msg "$NAME is not running."
+	fi
+	;;
+  restart|force-reload)
+	log_success_msg "Restarting $NAME"
+	d_stop
+	sleep 1
+	d_start
+	;;
+  *)
+	log_success_msg "Usage: $SCRIPTNAME {start|stop|restart|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0
