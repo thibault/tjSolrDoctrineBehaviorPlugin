@@ -7,6 +7,14 @@ in the Solr search engine.
 
 ### Plugin installation ###
 
+You can install this plugin the usual way (RTFM), or if you want to work with the trunk :
+
+    $ cd plugins
+    $ git clone git://github.com/thibault/tjSolrDoctrineBehaviorPlugin.git
+
+Then activate the plugin in the `config/ProjectConfiguration.class.php` file.
+
+
 ### Setting up Solr ###
 
 The recommended Solr version is the latest (1.4). It is not tested with any other Solr version.
@@ -14,8 +22,9 @@ The recommended Solr version is the latest (1.4). It is not tested with any othe
 A Solr installation is already embedded in the plugin, in the `lib/vendor/solr` directory.
 It's a default installation, and the only modified file is the `schema.xml`.
 
-If you want to use your own Solr installation, add those lines to the schema, in the "fields" section :
+If you want to use your own Solr installation, add those lines to the schema, in the "fields" section:
 
+    [xml]
     <!-- unique document id -->
     <field name="sf_unique_id" type="string" indexed="true" stored="true" required="true" />
 
@@ -28,8 +37,9 @@ If you want to use your own Solr installation, add those lines to the schema, in
     <!-- default search field -->
     <field name="sf_text" type="text" indexed="true" stored="true" multiValued="true" />
 
-And after the fields definition
+And after the fields definition:
 
+    [xml]
     <!-- Field to use to determine and enforce document uniqueness.
     Unless this field is marked with required="false", it will be a required field
     -->
@@ -57,17 +67,17 @@ system, however, some startup scripts are included in the `lib/vendor/scripts` d
 
 On a debian server :
 
-    # cp plugins/tjSolrDoctrineBehaviorPlugin/lib/vendor/scripts/debian/solr /etc/init.d/solr
-    # chmod 755 /etc/init.d/solr
-    # update-rc.d solr defaults
+    $ cp plugins/tjSolrDoctrineBehaviorPlugin/lib/vendor/scripts/debian/solr /etc/init.d/solr
+    $ chmod 755 /etc/init.d/solr
+    $ update-rc.d solr defaults
 
 Before running Solr, you have to set the SOLR_HOME value to your solr installation path in the script.
 
     SOLR_HOME=/var/www/myproject/plugins/tjSolrDoctrineBehaviorPlugin/lib/vendor/solr
 
-Then you can start the daemon
+Then you can start the daemon:
 
-    # /etc/init.d/solr start
+    $ /etc/init.d/solr start
 
 
 ## How to use ? ##
@@ -77,8 +87,9 @@ Then you can start the daemon
 To index some model objects into Solr, you have to modify your schema.yml file. Add the `Solr` behavior
 to the object type you want to index, and define which fields needs to be indexed.
 
-Here's an example schema file :
+Here's an example schema file:
 
+    [yml]
     Thread:
       columns:
         title:
@@ -107,28 +118,31 @@ Here's an example schema file :
 Rebuild your model, load your data, et voilà!
 Each time a Post object is created/updated/deleted, the Solr index will be automaticaly updated.
 
-### Fields mapping ###
+### Field mapping ###
 
-In the previous example, the plugin will try to index the title and body fields into Solr. 
+In the previous example, the plugin will try to index the title and body fields into Solr.
 You have to manualy define those names in the Solr schema, or indexing will fail :
 
+    [xml]
     <field name="title" type="text" indexed="true" stored="true" multiValued="false" />
     <field name="body" type="text" indexed="true" stored="true" multiValued="false" />
 
 You also have to make sure that those fiels are copied in the "sf_text" fields :
 
+    [xml]
     <copyField source="title" dest="sf_text" />
     <copyField source="body" dest="sf_text" />
 
-Configuring each field in the Solr schema can be a pain. That's why this plugin allows you to use 
-Solr's dynamic fields. 
+Configuring each field in the Solr schema can be a pain. That's why this plugin allows you to use
+Solr's dynamic fields.
 
 If your model field's name matches some specific pattern, the Solr field will be automaticaly created.
 For example, each field suffixed with "_t" will be created with a "text" type, and copied into the "sf_text"
 default search field.
 
-You have to configure this mapping in the Doctrine schema :
+You can to configure this mapping in the Doctrine schema :
 
+    [yml]
     Post:
       actAs:
         Solr:
@@ -142,6 +156,7 @@ Look into the "dynamicField" entries in the Solr's schema to see available patte
 
 This plugins uses the default Solr connexion parameters. You can override them in the doctrine schema :
 
+    [yml]
     Post:
       actAs:
         Solr:
@@ -152,7 +167,7 @@ This plugins uses the default Solr connexion parameters. You can override them i
           path: '/solr'
           …
 
-If you have a Solr installation with a multicore index, and whant to index differents object types,
+If you have a Solr installation with a multicore index, and want to index differents object types,
 just change the "path" parameter for each type.
 
 ### Searching ###
@@ -161,6 +176,7 @@ Indexing is good, but searching is better.
 
 Once you have attached the behavior to your model, it will provide a "search" method.
 
+    [php]
     $post = new Post();
     $post->title = 'test title';
     $post->body = 'this is my body';
@@ -178,10 +194,55 @@ Once you have attached the behavior to your model, it will provide a "search" me
     $results = Doctrine::getTable('Post')->search('title_t:test');
 
 This plugins internaly use the [solr-php-client](http://code.google.com/p/solr-php-client/) library to
-connect to Solr. The "search" method
+connect to Solr. The "search" method returns the solr xml response as a php object.
+
+    [php]
+    $results = Doctrine::getTable('Post')->search('*:*');
+    var_dump($results);
+
+    object(stdClass)#112 (3) {
+    ["numFound"]=>
+      int(2)
+      ["start"]=>
+      int(0)
+      ["docs"]=>
+      array(2) {
+        [0]=>
+          object(stdClass)#113 (7) {
+            ["sf_unique_id"]=>
+              string(8) "Post_598"
+              ["sf_meta_class"]=>
+              string(4) "Post"
+              ["sf_meta_id"]=>
+              int(598)
+              ["timestamp"]=>
+              string(24) "2009-12-30T10:34:44.458Z"
+              ["title_t"]=>
+              array(1) {
+                [0]=>
+                  string(28) "This is a gloubigoulba title"
+              }
+      …
 
 
-### Tweaking the index ###
+You can also set the `offset` and `limit` parameters.
+
+    [php]
+    $results = Doctrine::getTable('Post')->search('*:*', 0, 10);
+
+
+Instead of a dummy php array, the plugin can also generate a Doctrine_Query object,
+which you can manipulate as usual. For example, you can modify sorting options, paginate the list,
+add other criterias, etc.
+
+    [php]
+    $q = Doctrine::getTable('Post')->createSearchQuery('my query');
+
+    $maxResults = 50; // 256 is the function default, for a performance matter
+    $q2 = Doctrine::getTable('Post')->createSearchQuery('my other query', $maxResults);
+
+
+### Tweaking the index ###
 
 ### Transactions ###
 
