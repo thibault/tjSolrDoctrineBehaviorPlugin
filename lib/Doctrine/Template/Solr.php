@@ -234,4 +234,12 @@ class Doctrine_Template_Solr extends Doctrine_Template
       $this->getSolrService()->commit();
     }
   }
+
+  /**
+   * Returns true if we're in a middle of a transaction, false otherwise
+   **/
+  public function inTransactionTableProxy()
+  {
+    return $this->_inTransaction > 0;
+  }
 }

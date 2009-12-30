@@ -5,7 +5,7 @@
  */
 include dirname(__FILE__).'/../../../bootstrap/bootstrap.php';
 
-$t = new lime_test(20);
+$t = new lime_test(23);
 
 // We need access to Solr to run our tests. Ensure it is running
 if(!Doctrine::getTable('Post')->isSearchAvailable())
@@ -130,6 +130,17 @@ catch(sfException $e)
 {
   $t->pass('::commit() raise an exception when not in a transaction');
 }
+
+$t->is(Doctrine_Core::getTable('Post')->inTransaction(), false,
+  '::inTransaction() returns false when no transaction is started');
+Doctrine_Core::getTable('Post')->beginTransaction();
+$t->is(Doctrine_Core::getTable('Post')->inTransaction(), true,
+  '::inTransaction() returns true when a transaction is not yet commited');
+Doctrine_Core::getTable('Post')->commit();
+$t->is(Doctrine_Core::getTable('Post')->inTransaction(), false,
+  '::inTransaction() returns false when the transaction is commited');
+
+
 Doctrine_Core::getTable('Post')->beginTransaction();
 $post->title = 'glopgloppasglop';
 $post->save();
