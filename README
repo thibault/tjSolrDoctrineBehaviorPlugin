@@ -140,7 +140,7 @@ If your model field's name matches some specific pattern, the Solr field will be
 For example, each field suffixed with "_t" will be created with a "text" type, and copied into the "sf_text"
 default search field.
 
-You can to configure this mapping in the Doctrine schema :
+You can configure this mapping in the Doctrine schema :
 
     [yml]
     Post:
@@ -217,18 +217,18 @@ connect to Solr. The "search" method returns the solr xml response as a php obje
         [0]=>
           object(stdClass)#113 (7) {
             ["sf_unique_id"]=>
-              string(8) "Post_598"
-              ["sf_meta_class"]=>
-              string(4) "Post"
-              ["sf_meta_id"]=>
-              int(598)
-              ["timestamp"]=>
-              string(24) "2009-12-30T10:34:44.458Z"
-              ["title_t"]=>
-              array(1) {
-                [0]=>
-                  string(28) "This is a gloubigoulba title"
-              }
+            string(8) "Post_598"
+            ["sf_meta_class"]=>
+            string(4) "Post"
+            ["sf_meta_id"]=>
+            int(598)
+            ["timestamp"]=>
+            string(24) "2009-12-30T10:34:44.458Z"
+            ["title_t"]=>
+            array(1) {
+              [0]=>
+                string(28) "gloubigoulba glop glop"
+            }
       …
 
 
@@ -239,7 +239,7 @@ You can also set the `offset` and `limit` parameters.
 
 
 Instead of a dummy php array, the plugin can also generate a Doctrine_Query object,
-which you can manipulate as usual. For example, you can modify sorting options, paginate the list,
+which you can manipulate as usual. For instance, you can modify sorting options, paginate the list,
 add other criterias, etc.
 
     [php]
@@ -248,7 +248,7 @@ add other criterias, etc.
     $maxResults = 50; // 256 is the function default, for a performance matter
     $q2 = Doctrine::getTable('Post')->createSearchQuery('my other query', $maxResults);
 
-There is a last available method to performs a search. You can use the `solr:search`.
+There is a last available method to performs a search. You can use the `solr:search` task from the command line.
 
     $ php symfony solr:search Post "my query"
     $ php symfony help solr:search
@@ -280,6 +280,7 @@ commit when the job's done.
     $tread->save();
 
     Doctrine_Core::getTable('Post')->beginTransaction();
+
     for($i = 0 ; $i < 20 ; $i++)
     {
       $post = new Post();
@@ -289,7 +290,7 @@ commit when the job's done.
       $post->save();
     }
 
-    // You can use the inTransaction to know if a transaction exists
+    // You can use the inTransaction function to know if a transaction exists
     Doctrine_Core::getTable('Post')->inTransaction(); // returns true
 
     // After the commit, data will be available for searching
@@ -298,7 +299,7 @@ commit when the job's done.
 ## Testing the plugin ##
 
 This plugins comes with an auto-generated (with the `sfTaskExtraPlugin`) fixtures project, to run the tests
-without touching your own app. Tests are not included in the package version, so you'll have to check out
+without touching your own app. Tests are not included in the package version, so you'll have to checkout
 the trunk version.
 
 Before you run the tests, make sure Solr is running is accessible.
@@ -320,7 +321,7 @@ Here's how you can easily run the plugin test suite :
 
         $ php plugins/tjSolrDoctrineBehaviorPlugin/test/fixtures/project/symfony configure:database --env=test
 
-  * build the bootstrap project. You don't have to load the fixtures, this will be automatic.
+  * build the bootstrap project. You don't have to load the fixtures, this will be done on time.
 
         $ php plugins/tjSolrDoctrineBehaviorPlugin/test/fixtures/project/symfony doctrine:build --env=test --all
 
