@@ -5,6 +5,189 @@ in the Solr search engine.
 
 ## Installation ##
 
+### Plugin installation ###
+
+### Setting up Solr ###
+
+The recommended Solr version is the latest (1.4). It is not tested with any other Solr version.
+
+A Solr installation is already embedded in the plugin, in the `lib/vendor/solr` directory.
+It's a default installation, and the only modified file is the `schema.xml`.
+
+If you want to use your own Solr installation, add those lines to the schema, in the "fields" section :
+
+    <!-- unique document id -->
+    <field name="sf_unique_id" type="string" indexed="true" stored="true" required="true" />
+
+    <!-- indexed object class -->
+    <field name="sf_meta_class" type="string" indexed="true" stored="true" required="true" />
+
+    <!-- indexed object id -->
+    <field name="sf_meta_id" type="sint" indexed="true" stored="true" required="true" />
+
+    <!-- default search field -->
+    <field name="sf_text" type="text" indexed="true" stored="true" multiValued="true" />
+
+And after the fields definition
+
+    <!-- Field to use to determine and enforce document uniqueness.
+    Unless this field is marked with required="false", it will be a required field
+    -->
+    <uniqueKey>sf_unique_id</uniqueKey>
+
+    <!-- field for the QueryParser to use when an explicit fieldname is absent -->
+    <defaultSearchField>sf_text</defaultSearchField>
+
+    <!-- copyField commands copy one field to another at the time a document
+    is added to the index.  It's used either to index the same field differently,
+    or to add multiple fields to the same field for easier/faster searching.
+    -->
+    <copyField source="*_t" dest="sf_text" />
+    <copyField source="*_s" dest="sf_text" /
+
+Once your configuration is correct, you can start Solr. Of course, you need a java installation.
+
+    $ cd plugins/tjSolrDoctrineBehaviorPlugin/lib/vendor/solr
+    $ java -jar start.jar
+
+### Solr in a production environment ###
+
+In a production environment, you should run Solr as a daemon. The right way to do depends on your server's
+system, however, some startup scripts are included in the `lib/vendor/scripts` directory.
+
+On a debian server :
+
+    # cp plugins/tjSolrDoctrineBehaviorPlugin/lib/vendor/scripts/debian/solr /etc/init.d/solr
+    # chmod 755 /etc/init.d/solr
+    # update-rc.d solr defaults
+
+Before running Solr, you have to set the SOLR_HOME value to your solr installation path in the script.
+
+    SOLR_HOME=/var/www/myproject/plugins/tjSolrDoctrineBehaviorPlugin/lib/vendor/solr
+
+Then you can start the daemon
+
+    # /etc/init.d/solr start
+
+
+## How to use ? ##
+
+### Enabling the behavior ###
+
+To index some model objects into Solr, you have to modify your schema.yml file. Add the `Solr` behavior
+to the object type you want to index, and define which fields needs to be indexed.
+
+Here's an example schema file :
+
+    Thread:
+      columns:
+        title:
+          type: string(255)
+          notnull: true
+
+    Post:
+      actAs:
+        Solr:
+          fields: [ title, body ]
+      columns:
+        thread_id:
+          type: integer
+          notnull: true
+        title:
+          type: string(255)
+          notnull: true
+        body:
+          type: clob
+          notnull: true
+      relations:
+        Thread:
+          onDelete: CASCADE
+          foreignAlias: Posts
+
+Rebuild your model, load your data, et voilà!
+Each time a Post object is created/updated/deleted, the Solr index will be automaticaly updated.
+
+### Fields mapping ###
+
+In the previous example, the plugin will try to index the title and body fields into Solr. 
+You have to manualy define those names in the Solr schema, or indexing will fail :
+
+    <field name="title" type="text" indexed="true" stored="true" multiValued="false" />
+    <field name="body" type="text" indexed="true" stored="true" multiValued="false" />
+
+You also have to make sure that those fiels are copied in the "sf_text" fields :
+
+    <copyField source="title" dest="sf_text" />
+    <copyField source="body" dest="sf_text" />
+
+Configuring each field in the Solr schema can be a pain. That's why this plugin allows you to use 
+Solr's dynamic fields. 
+
+If your model field's name matches some specific pattern, the Solr field will be automaticaly created.
+For example, each field suffixed with "_t" will be created with a "text" type, and copied into the "sf_text"
+default search field.
+
+You have to configure this mapping in the Doctrine schema :
+
+    Post:
+      actAs:
+        Solr:
+          fields: [ title, body ]
+          fieldmap: { title: title_t, body: body_t }
+          …
+
+Look into the "dynamicField" entries in the Solr's schema to see available patterns.
+
+### Connecting to Solr ###
+
+This plugins uses the default Solr connexion parameters. You can override them in the doctrine schema :
+
+    Post:
+      actAs:
+        Solr:
+          fields: [ title, body ]
+          fieldmap: { title: title_t, body: body_t }
+          host: localhost
+          post: 8389
+          path: '/solr'
+          …
+
+If you have a Solr installation with a multicore index, and whant to index differents object types,
+just change the "path" parameter for each type.
+
+### Searching ###
+
+Indexing is good, but searching is better.
+
+Once you have attached the behavior to your model, it will provide a "search" method.
+
+    $post = new Post();
+    $post->title = 'test title';
+    $post->body = 'this is my body';
+    $post->Thread = new Thread();
+    $post->Thread->title = 'test thread';
+    $post->save();
+
+    // returns every indexed elements
+    $results = Doctrine::getTable('Post')->search('*:*');
+
+    // search in every text fields
+    $results = Doctrine::getTable('Post')->search('test');
+
+    // search only in "title" field
+    $results = Doctrine::getTable('Post')->search('title_t:test');
+
+This plugins internaly use the [solr-php-client](http://code.google.com/p/solr-php-client/) library to
+connect to Solr. The "search" method
+
+
+### Tweaking the index ###
+
+### Transactions ###
+
+### The tasks ###
+
+
 ## Testing the plugin ##
 
 This plugins comes with an auto-generated (with the `sfTaskExtraPlugin`) fixtures project, to run the tests
@@ -36,7 +219,7 @@ Here's how you can easily run the plugin test suite :
   * run the tests
 
         $ php symfony test:plugin tjSolrDoctrineBehaviorPlugin
-    
+
     or, if the sfTaskExtraPlugin is not installed :
 
         $ php plugins/tjSolrDoctrineBehaviorPlugin/test/bin/prove.php
