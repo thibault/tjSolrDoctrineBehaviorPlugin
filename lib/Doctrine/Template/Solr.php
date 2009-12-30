@@ -141,7 +141,8 @@ class Doctrine_Template_Solr extends Doctrine_Template
   public function deleteIndexTableProxy()
   {
     $solr = $this->getSolrService();
-    $solr->deleteByQuery('*:*');
+    $q = 'sf_meta_class:'.get_class($this->getInvoker());
+    $solr->deleteByQuery($q);
 
     if($this->_inTransaction == 0)
       $solr->commit();
