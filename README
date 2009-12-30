@@ -298,7 +298,8 @@ commit when the job's done.
 ## Testing the plugin ##
 
 This plugins comes with an auto-generated (with the `sfTaskExtraPlugin`) fixtures project, to run the tests
-without touching your own app.
+without touching your own app. Tests are not included in the package version, so you'll have to check out
+the trunk version.
 
 Before you run the tests, make sure Solr is running is accessible.
 
