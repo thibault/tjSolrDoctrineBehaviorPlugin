@@ -177,6 +177,13 @@ Indexing is good, but searching is better.
 Once you have attached the behavior to your model, it will provide a "search" method.
 
     [php]
+
+    // returns true or false wether solr is available or not
+    $solrAvailable = Doctrine_Core::getTable('Post')->isSearchAvailable();
+
+    if(!$solrAvailable)
+      throw new sfException('Search is unavailable right now. Please come back later');
+
     $post = new Post();
     $post->title = 'test title';
     $post->body = 'this is my body';
@@ -241,13 +248,52 @@ add other criterias, etc.
     $maxResults = 50; // 256 is the function default, for a performance matter
     $q2 = Doctrine::getTable('Post')->createSearchQuery('my other query', $maxResults);
 
+There is a last available method to performs a search. You can use the `solr:search`.
 
-### Tweaking the index ###
+    $ php symfony solr:search Post "my query"
+    $ php symfony help solr:search
+
+### reset index ###
+
+Sometimes, you may want to reset the index and clear all indexed objects. There is a function to do this.
+
+    [php]
+
+    // remove all posts from solr index
+    Doctrine_Core::getTable('Post')->deleteIndex();
+
+You can also do this from the command line.
+
+    $ php symfony solr:reset-index Post
+    $ php symfony help solr:reset-index
+
 
 ### Transactions ###
 
-### The tasks ###
+Solr supports transactions. By default, the plugins sends a `commit` message after every index operation.
+However, you may want to perform many operations in one time, then it is more efficient to send only one
+commit when the job's done.
 
+    [php]
+    $thread = new Thread();
+    $thread->title = 'test tread';
+    $tread->save();
+
+    Doctrine_Core::getTable('Post')->beginTransaction();
+    for($i = 0 ; $i < 20 ; $i++)
+    {
+      $post = new Post();
+      $post->title = "post $i";
+      $post->body = 'post body';
+      $post->Thread = $thread
+      $post->save();
+    }
+
+    // You can use the inTransaction to know if a transaction exists
+    Doctrine_Core::getTable('Post')->inTransaction(); // returns true
+
+    // After the commit, data will be available for searching
+    Doctrine_Core::getTable('Post')->commit();
 
 ## Testing the plugin ##
 
@@ -284,3 +330,13 @@ Here's how you can easily run the plugin test suite :
     or, if the sfTaskExtraPlugin is not installed :
 
         $ php plugins/tjSolrDoctrineBehaviorPlugin/test/bin/prove.php
+
+## TODO ##
+
+Here's some ideas for further developpements:
+
+* Add an option to allow or not objects modifications when solr is unavailable
+* Add a task to batch index objects
+* Compatibility with the i18n behavior
+* Add geolocation search
+* add a moreLikeThis() function
