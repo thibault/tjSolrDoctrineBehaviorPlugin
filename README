@@ -1,4 +1,4 @@
-# tjSolrDoctrineBehaviorPlugin (sf1.3/1.4) #
+# tjSolrDoctrineBehaviorPlugin #
 
 The `tjSolrDoctrineBehaviorPlugin` provides a Doctrine behavior to easily index and search model objects
 in the Solr search engine.
@@ -15,7 +15,7 @@ You can install this plugin the usual way (RTFM), or if you want to work with th
 Then activate the plugin in the `config/ProjectConfiguration.class.php` file.
 
 
-### Setting up Solr ###
+### Setting up Solr ###
 
 The recommended Solr version is the latest (1.4). It is not tested with any other Solr version.
 
@@ -71,18 +71,31 @@ On a debian server :
     $ chmod 755 /etc/init.d/solr
     $ update-rc.d solr defaults
 
-Before running Solr, you have to set the SOLR_HOME value to your solr installation path in the script.
+Before running Solr, just set the PROJECT_NAME value to your symfony project directory.
 
-    SOLR_HOME=/var/www/myproject/plugins/tjSolrDoctrineBehaviorPlugin/lib/vendor/solr
+    PROJECT_NAME=mysfproject
+
+The Solr index will be created in you `data` dir, and the logs will go in `log` dir.
+You have to create one last directory before we're ready.
+
+    $ mkdir logs/solr
+
+More logging configuration can be found in the
+`plugins/tjSolrDoctrineBehaviorPlugin/lib/vendor/solr/logging.properties` file.
+You can check out some more [documentation about logging here](http://wiki.apache.org/solr/LoggingInDefaultJettySetup).
 
 Then you can start the daemon:
 
     $ /etc/init.d/solr start
 
+Check this URL to be sure everything went fine.
+
+    [http://localhost:8983/solr/admin/](http://localhost:8983/solr/admin/)
+
 
 ## How to use ? ##
 
-### Enabling the behavior ###
+### Enabling the behavior ###
 
 To index some model objects into Solr, you have to modify your schema.yml file. Add the `Solr` behavior
 to the object type you want to index, and define which fields needs to be indexed.
