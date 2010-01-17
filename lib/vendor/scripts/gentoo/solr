@@ -4,11 +4,22 @@ description="Java Solr search engine."
 
 JAVA="/usr/bin/java"
 
-# Folder in which resides start.jar
-SOLR_HOME="/opt/solr/java/"
-# Folder containing the cores (and solr.xml)
-SOLR_CORES="/opt/solr/cores/"
-SOLR_OPTIONS="-Dsolr.solr.home=$SOLR_CORES"
+# Your symfony project
+PROJECT_NAME=sfproject
+PROJECT_DIR="/var/www/$PROJECT_NAME"
+
+# Replace with the solr installation path
+SOLR_HOME="$PROJECT_DIR/plugins/tjSolrDoctrineBehaviorPlugin/lib/vendor/solr"
+
+# The data directory
+SOLR_DATA="$PROJECT_DIR/data/solr"
+
+# The log directory
+SOLR_LOG="$PROJECT_DIR/log/solr"
+
+SOLR_OPTIONS="-Dsolr.data.dir=$SOLR_DATA"
+SOLR_OPTIONS="$PARAMETERS -Djava.util.logging.config.file=$SOLR_HOME/logging.properties"
+
 SOLR_PID="/var/run/solr.pid"
 
 start() {

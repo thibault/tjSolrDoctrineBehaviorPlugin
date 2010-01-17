@@ -19,8 +19,23 @@
 
 DESC="Solr indexing server"
 NAME=solr
-SOLR_HOME= # Set solr home here (example: /var/www/ezpublish/extension/ezfind/java)
 JAVA_HOME= # Set java home here if java is not available in /usr/bin/java or /usr/local/bin/java
+
+# Your symfony project
+PROJECT_NAME=sfproject
+PROJECT_DIR="/var/www/$PROJECT_NAME"
+
+# Replace with the solr installation path
+SOLR_HOME="$PROJECT_DIR/plugins/tjSolrDoctrineBehaviorPlugin/lib/vendor/solr"
+
+# The data directory
+SOLR_DATA="$PROJECT_DIR/data/solr"
+
+# The log directory
+SOLR_LOG="$PROJECT_DIR/log/solr"
+
+PARAMETERS="-Dsolr.data.dir=$SOLR_DATA"
+PARAMETERS="$PARAMETERS -Djava.util.logging.config.file=$SOLR_HOME/logging.properties"
 
 source /etc/rc.d/init.d/functions
 
@@ -42,7 +57,7 @@ RETVAL=0
 d_start() {
     CURRENT_DIR=`pwd`
     cd $SOLR_HOME
-    daemon --check $NAME --pidfile /var/run/solr.pid nohup $JAVA -jar start.jar > /dev/null 2>&1 &
+    daemon --check $NAME --pidfile /var/run/solr.pid nohup $JAVA $PARAMETERS -jar start.jar > /dev/null 2>&1 &
     RETVAL=$?
     sleep 1 # Sleep 1 second, to make sure java is registered.
     pid=`pidof java`
