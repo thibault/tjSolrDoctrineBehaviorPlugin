@@ -55,10 +55,9 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function addToIndex()
   {
-    $invoker = $this->getInvoker();
     $solr = $this->_solr;
 
-    $solr->addDocument($invoker->getSolrDocument());
+    $solr->addDocument($this->getSolrDocument());
 
     if($this->_inTransaction == 0)
       $solr->commit();
@@ -69,10 +68,9 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function deleteFromIndex()
   {
-    $invoker = $this->getInvoker();
     $solr = $this->_solr;
 
-    $solr->deleteById($invoker->getSolrId());
+    $solr->deleteById($this->getSolrId());
 
     if($this->_inTransaction == 0)
       $solr->commit();
