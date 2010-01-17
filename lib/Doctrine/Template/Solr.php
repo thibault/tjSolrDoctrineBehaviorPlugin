@@ -18,8 +18,8 @@ class Doctrine_Template_Solr extends Doctrine_Template
     'boost' => array()
   );
 
-  protected static $solr;
-  protected $_inTransaction;
+  private $_solr;
+  private $_inTransaction;
 
   public function setTableDefinition()
   {
@@ -29,26 +29,9 @@ class Doctrine_Template_Solr extends Doctrine_Template
   public function setUp()
   {
     $this->_inTransaction = 0;
-  }
-
-  /**
-    * Returns a solr connexion handler
-    *
-    * @return Apache_Solr_Service
-   **/
-  public function getSolrService()
-  {
-    static $solr;
-
-    if(null === $solr)
-    {
-      $solr = new Apache_Solr_Service($this->_options['host'],
+    $this->_solr = new Apache_Solr_Service($this->_options['host'],
                                       $this->_options['port'],
-                                      $this->_options['path']
-      );
-    }
-
-    return $solr;
+                                      $this->_options['path']);
   }
 
   /**
@@ -56,7 +39,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function isSearchAvailableTableProxy()
   {
-    return $this->getSolrService()->ping();
+    return $this->_solr->ping();
   }
 
   /**
@@ -73,7 +56,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
   public function addToIndex()
   {
     $invoker = $this->getInvoker();
-    $solr = $invoker->getSolrService();
+    $solr = $this->_solr;
 
     $solr->addDocument($invoker->getSolrDocument());
 
@@ -87,7 +70,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
   public function deleteFromIndex()
   {
     $invoker = $this->getInvoker();
-    $solr = $invoker->getSolrService();
+    $solr = $this->_solr;
 
     $solr->deleteById($invoker->getSolrId());
 
@@ -140,7 +123,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function deleteIndexTableProxy()
   {
-    $solr = $this->getSolrService();
+    $solr = $this->_solr;
     $q = 'sf_meta_class:'.get_class($this->getInvoker());
     $solr->deleteByQuery($q);
 
@@ -155,7 +138,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function searchTableProxy($search, $offset = 0, $limit = 30)
   {
-    $solr = $this->getSolrService();
+    $solr = $this->_solr;
 
     // We filter the results types
     $params = array(
@@ -231,7 +214,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
     if($this->_inTransaction == 0)
     {
-      $this->getSolrService()->commit();
+      $this->_solr->commit();
     }
   }
 
