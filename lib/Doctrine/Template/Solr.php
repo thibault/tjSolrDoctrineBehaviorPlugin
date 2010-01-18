@@ -36,6 +36,16 @@ class Doctrine_Template_Solr extends Doctrine_Template
   }
 
   /**
+   * Override the search handler
+   *
+   * Only useful for tests, to replace the actual search handler by a mock
+   **/
+  public function setSearchHandlerTableProxy(Search_Handler_Interface $handler)
+  {
+    $this->_search = new Search_Service($handler);
+  }
+
+  /**
    * Return true if the search is currently available
    **/
   public function isSearchAvailableTableProxy()
