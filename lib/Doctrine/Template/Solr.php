@@ -27,7 +27,12 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
   public function setUp()
   {
-    $this->_search = new Search_Service($this->_options);
+    $searchHandler = new Search_Handler_Solr(
+      $this->_options['host'],
+      $this->_options['port'],
+      $this->_options['path']
+    );
+    $this->_search = new Search_Service($searchHandler);
   }
 
   /**
@@ -65,19 +70,19 @@ class Doctrine_Template_Solr extends Doctrine_Template
   /**
     * Build a Document for Solr indexing
     *
-    * @return Apache_Solr_Document
+    * @return array
    **/
-  public function getSolrDocument()
+  public function getFieldsArray()
   {
-    $document = new Apache_Solr_Document();
+    $document = array();
     $invoker = $this->getInvoker();
 
     // Set document key
-    $document->addField($this->_options['key'], $this->getUniqueId());
+    $document[$this->_options['key']]['value'] = $this->getUniqueId();
 
     // set meta data
-    $document->addField('sf_meta_class', get_class($invoker));
-    $document->addField('sf_meta_id', $invoker->getId());
+    $document['sf_meta_class']['value'] = get_class($invoker);
+    $document['sf_meta_id']['value'] = $invoker->getId();
 
     // Set others fields
     $fields = $this->_options['fields'];
@@ -90,11 +95,8 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
       $value = $invoker->get($field);
 
-      // Solr_Apache_Document always expect an array
-      if(!is_array($value))
-        $value = array($value);
-
-      $document->setField($fieldName, $value, $fieldBoost);
+      $document[$fieldName]['value'] = $value;
+      $document[$fieldName]['boost'] = $fieldBoost;
     }
 
     return $document;

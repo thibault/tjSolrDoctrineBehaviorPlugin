@@ -31,11 +31,21 @@ Interface Search_Handler_Interface
   public function unindex($uniqueId);
 
   /**
+   * Deletets all elements from the specified class from the index
+   *
+   * @param string $class
+   **/
+  public function deleteAllFromClass($class);
+
+  /**
    * Performs a query
    *
    * @param string $query
+   * @param integer $offset
+   * @param integer $limit
+   * @param array $params Additional parameters
    **/
-  public function query($query);
+  public function search($query, $offset, $limit, $params);
 
   /**
    * Send a commit message to the search engine

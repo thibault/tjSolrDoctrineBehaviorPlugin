@@ -11,23 +11,19 @@
  **/
 class Search_Service
 {
-  private $_solr;
+  private $_searchHandler;
   private $_inTransaction;
 
   /**
    * __construct
    *
-   * @param array options
+   * @param Search_Handler_Interface $searchHandler The object that actually communicate to the search engine
    * $return void
    **/
-  public function __construct(array $options = array())
+  public function __construct(Search_Handler_Interface $searchHandler)
   {
     $this->_inTransaction = 0;
-    $this->_solr = new Apache_Solr_Service(
-      $options['host'],
-      $options['port'],
-      $options['path']
-    );
+    $this->_searchHandler = $searchHandler;
   }
 
   /**
@@ -37,7 +33,7 @@ class Search_Service
    **/
   public function isAvailable()
   {
-    return true;
+    return $this->_searchHandler->isAvailable();
   }
 
   /**
@@ -47,10 +43,10 @@ class Search_Service
    **/
   public function addToIndex(sfDoctrineRecord $record)
   {
-    $this->_solr->addDocument($record->getSolrDocument());
+    $this->_searchHandler->index($record->getFieldsArray());
 
     if($this->_inTransaction == 0)
-      $this->_solr->commit();
+      $this->_searchHandler->commit();
   }
 
   /**
@@ -60,10 +56,10 @@ class Search_Service
    **/
   public function deleteFromIndex(sfDoctrineRecord $record)
   {
-    $this->_solr->deleteById($record->getUniqueId());
+    $this->_searchHandler->unindex($record->getUniqueId());
 
     if($this->_inTransaction == 0)
-      $this->_solr->commit();
+      $this->_searchHandler->commit();
   }
 
   /**
@@ -73,11 +69,10 @@ class Search_Service
    **/
   public function deleteIndex($class)
   {
-    $q = "sf_meta_class:$class";
-    $this->_solr->deleteByQuery($q);
+    $this->_searchHandler->deleteAllFromClass($class);
 
     if($this->_inTransaction == 0)
-      $this->_solr->commit();
+      $this->_searchHandler->commit();
   }
 
   /**
@@ -96,7 +91,7 @@ class Search_Service
       'fq' => "sf_meta_class:$class"
     );
 
-    $results = $this->_solr->search($search, $offset, $limit, $params);
+    $results = $this->_searchHandler->search($search, $offset, $limit, $params);
     $response = json_decode($results->getRawResponse());
 
     return $response->response;
@@ -124,7 +119,7 @@ class Search_Service
 
     if($this->_inTransaction == 0)
     {
-      $this->_solr->commit();
+      $this->_searchHandler->commit();
     }
   }
 
