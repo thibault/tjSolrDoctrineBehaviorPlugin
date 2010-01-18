@@ -18,8 +18,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
     'boost' => array()
   );
 
-  private $_solr;
-  private $_inTransaction;
+  private $_search;
 
   public function setTableDefinition()
   {
@@ -28,24 +27,21 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
   public function setUp()
   {
-    $this->_inTransaction = 0;
-    $this->_solr = new Apache_Solr_Service($this->_options['host'],
-                                      $this->_options['port'],
-                                      $this->_options['path']);
+    $this->_search = new Search_Service($this->_options);
   }
 
   /**
-    * Return true if the solr handler is available and connected
+   * Return true if the search is currently available
    **/
   public function isSearchAvailableTableProxy()
   {
-    return $this->_solr->ping();
+    return $this->_search->isAvailable();
   }
 
   /**
-   * Get a unique solr document identifier
+   * Get a unique document identifier
    **/
-  public function getSolrId()
+  public function getUniqueId()
   {
     return sprintf('%s_%s', get_class($this->getInvoker()), $this->getInvoker()->getId());
   }
@@ -55,12 +51,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function addToIndex()
   {
-    $solr = $this->_solr;
-
-    $solr->addDocument($this->getSolrDocument());
-
-    if($this->_inTransaction == 0)
-      $solr->commit();
+    $this->_search->addToIndex($this->getInvoker());
   }
 
   /**
@@ -68,12 +59,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function deleteFromIndex()
   {
-    $solr = $this->_solr;
-
-    $solr->deleteById($this->getSolrId());
-
-    if($this->_inTransaction == 0)
-      $solr->commit();
+    $this->_search->deleteFromIndex($this->getInvoker());
   }
 
   /**
@@ -87,7 +73,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
     $invoker = $this->getInvoker();
 
     // Set document key
-    $document->addField($this->_options['key'], $this->getSolrId());
+    $document->addField($this->_options['key'], $this->getUniqueId());
 
     // set meta data
     $document->addField('sf_meta_class', get_class($invoker));
@@ -121,12 +107,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function deleteIndexTableProxy()
   {
-    $solr = $this->_solr;
-    $q = 'sf_meta_class:'.get_class($this->getInvoker());
-    $solr->deleteByQuery($q);
-
-    if($this->_inTransaction == 0)
-      $solr->commit();
+    $this->_search->deleteIndex(get_class($this->getInvoker()));
   }
 
   /**
@@ -136,17 +117,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function searchTableProxy($search, $offset = 0, $limit = 30)
   {
-    $solr = $this->_solr;
-
-    // We filter the results types
-    $params = array(
-      'fq' => 'sf_meta_class:'.get_class($this->getInvoker())
-    );
-
-    $results = $solr->search($search, $offset, $limit, $params);
-    $response = json_decode($results->getRawResponse());
-
-    return $response->response;
+    return $this->_search->search($search, $offset, $limit, get_class($this->getInvoker()));
   }
 
   /**
@@ -194,7 +165,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function beginTransactionTableProxy()
   {
-    $this->_inTransaction++;
+    $this->_search->beginTransaction();
   }
 
   /**
@@ -205,15 +176,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function commitTableProxy()
   {
-    if($this->_inTransaction < 1)
-      throw new sfException('Cannot commit when not in transaction');
-
-    $this->_inTransaction--;
-
-    if($this->_inTransaction == 0)
-    {
-      $this->_solr->commit();
-    }
+    $this->_search->commit();
   }
 
   /**
@@ -221,6 +184,6 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function inTransactionTableProxy()
   {
-    return $this->_inTransaction > 0;
+    return $this->_search->inTransaction();
   }
 }

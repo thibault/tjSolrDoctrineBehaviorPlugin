@@ -27,9 +27,9 @@ $t->comment('-> Template availability');
 $t->ok(is_callable(array(Doctrine::getTable('Post'), 'isSearchAvailable')),
   'Templates function are available');
 
-$t->comment('-> getSolrId');
-$t->is($post->getSolrId(), sprintf('Post_%d', $post->getId()),
-  '::getSolrId() generates a correct identifier');
+$t->comment('-> getUniqueId');
+$t->is($post->getUniqueId(), sprintf('Post_%d', $post->getId()),
+  '::getUniqueId() generates a correct identifier');
 
 $t->comment('-> deleteFromIndex');
 $post->deleteFromIndex();
