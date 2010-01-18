@@ -28,9 +28,9 @@ class Search_Handler_Solr implements Search_Handler_Interface
   }
 
   /**
-   * @see Search_Handler_Interface::index()
+   * Builds an Apache_Solr_Document to pass to Apache_Solr_Service
    **/
-  public function index(array $document)
+  public function buildDocument(array $document)
   {
     $doc = new Apache_Solr_Document();
 
@@ -47,6 +47,15 @@ class Search_Handler_Solr implements Search_Handler_Interface
       $doc->setField($fieldName, $value, $fieldBoost);
     }
 
+    return $doc;
+  }
+
+  /**
+   * @see Search_Handler_Interface::index()
+   **/
+  public function index(array $document)
+  {
+    $doc = $this->buildDocument($document);
     $this->_service->addDocument($doc);
   }
 
