@@ -84,12 +84,11 @@ class Search_Service
    * @param string $class Limit the type of object that should be returned
    * @return array The response
    **/
-  public function search($search, $offset, $limit, $class)
+  public function search($search, $offset, $limit, $class, $params)
   {
     // We filter the results types
-    $params = array(
-      'fq' => "sf_meta_class:$class"
-    );
+    if(!isset($params['fq']))
+      $params['fq'] = "sf_meta_class:$class";
 
     return $this->_searchHandler->search($search, $offset, $limit, $params);
   }

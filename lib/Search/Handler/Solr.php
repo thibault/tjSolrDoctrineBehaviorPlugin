@@ -42,9 +42,10 @@ class Search_Handler_Solr implements Search_Handler_Interface
       if(!is_array($value))
         $value = array($value);
 
-      $fieldBoost = $field['boost'];
-
-      $doc->setField($fieldName, $value, $fieldBoost);
+      if(isset($field['boost']))
+        $doc->setField($fieldName, $value, $field['boost']);
+      else
+        $doc->setField($fieldName, $value);
     }
 
     return $doc;

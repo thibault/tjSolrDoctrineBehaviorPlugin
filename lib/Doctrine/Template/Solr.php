@@ -130,9 +130,9 @@ class Doctrine_Template_Solr extends Doctrine_Template
    *
    * @return array The solr response as a php array
    **/
-  public function searchTableProxy($search, $offset = 0, $limit = 30)
+  public function searchTableProxy($search, $offset = 0, $limit = 30, $params = array())
   {
-    return $this->_search->search($search, $offset, $limit, get_class($this->getInvoker()));
+    return $this->_search->search($search, $offset, $limit, get_class($this->getInvoker()), $params);
   }
 
   /**
