@@ -145,9 +145,9 @@ class Doctrine_Template_Solr extends Doctrine_Template
     $response = $this->getTable()->search($search, 0, $limit);
 
     $pks = array();
-    foreach($response->docs as $doc)
+    foreach($response['docs'] as $doc)
     {
-      $pks[] = $doc->sf_meta_id;
+      $pks[] = $doc['sf_meta_id'];
     }
 
     $q = $this->getTable()->createQuery();
