@@ -87,7 +87,9 @@ class Search_Service
   public function search($search, $offset, $limit, $class, $params)
   {
     // We filter the results types
-    if(!isset($params['fq']))
+    if(isset($params['fq']))
+      $params['fq'] = array("sf_meta_class:$class", $params['fq']);
+    else
       $params['fq'] = "sf_meta_class:$class";
 
     return $this->_searchHandler->search($search, $offset, $limit, $params);

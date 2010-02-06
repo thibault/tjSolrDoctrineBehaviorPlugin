@@ -67,7 +67,7 @@ $service->beginTransaction();
 $service->commit();
 $t->ok(!$service->inTransaction());
 
-// @Test: addToIndex raise a commit when not in transaction
+// @Test: addToIndex() raise a commit when not in transaction
 
 $handler->any('index')->once();
 $handler->commit()->once();
@@ -78,7 +78,7 @@ $service->addToIndex(new Post());
 $handler->verify();
 
 
-// @Test: addToIndex raise no commit when in transaction
+// @Test: addToIndex() raise no commit when in transaction
 // We could also write the same test for deleteFromIndex and deleteIndex, but what a waste of time
 
 $handler->any('index')->once();
@@ -90,4 +90,41 @@ $service->addToIndex(new Post());
 
 $handler->verify();
 
+// @Test: search() correctly set the fq parameter
 
+$fqArray = array(
+  'fq' => 'sf_meta_class:Post'
+);
+$handler->search('*:*', 0, 10, $fqArray)->once();
+$handler->replay();
+
+$service->search('*:*', 0, 10, 'Post', array());
+
+$handler->verify();
+
+// @Test: search() correctly set the fq parameter when extra params are set
+
+$fqArray = array(
+  'fq' => 'sf_meta_class:Post',
+  'sort' => 'score desc'
+);
+$handler->search('*:*', 0, 10, $fqArray)->once();
+$handler->replay();
+
+$service->search('*:*', 0, 10, 'Post', array('sort' => 'score desc'));
+
+$handler->verify();
+
+// @Test: search() correctly set the fq parameter when an extra fq param is set
+
+$fqArray = array(
+  'fq' => array(
+    'sf_meta_class:Post', 'sf_meta_id:1'
+  )
+);
+$handler->search('*:*', 0, 10, $fqArray)->once();
+$handler->replay();
+
+$service->search('*:*', 0, 10, 'Post', array('fq' => 'sf_meta_id:1'));
+
+$handler->verify();
