@@ -18,6 +18,9 @@ class Doctrine_Template_Solr extends Doctrine_Template
     'boost' => array()
   );
 
+  /**
+   * @var Search_Service $_search This is the way to handle Solr communication
+   **/
   private $_search;
 
   public function setTableDefinition()
