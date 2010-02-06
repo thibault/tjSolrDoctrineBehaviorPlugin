@@ -316,6 +316,9 @@ without touching your own app. Tests are not included in the package version, so
 the trunk version.
 
 Before you run the tests, make sure Solr is running is accessible.
+Note that those tests are written to be run with lime 2 (alpha1).
+
+WARNING : By default, the tests will be run over the default Solr index. Make sure you won't lose any data.
 
 Here's how you can easily run the plugin test suite :
 
