@@ -213,37 +213,76 @@ Once you have attached the behavior to your model, it will provide a "search" me
     // search only in "title" field
     $results = Doctrine::getTable('Post')->search('title_t:test');
 
-This plugins internaly use the [solr-php-client](http://code.google.com/p/solr-php-client/) library to
-connect to Solr. The "search" method returns the solr xml response as a php object.
+The `search` methods retuns a php array corresponding to the Solr xml response.
 
     [php]
     $results = Doctrine::getTable('Post')->search('*:*');
     var_dump($results);
 
-    object(stdClass)#112 (3) {
-    ["numFound"]=>
-      int(2)
-      ["start"]=>
-      int(0)
-      ["docs"]=>
-      array(2) {
-        [0]=>
-          object(stdClass)#113 (7) {
+    array(2) {
+      ["responseHeader"]=>
+      array(3) {
+        ["status"]=>
+        int(0)
+        ["QTime"]=>
+        int(0)
+        ["params"]=>
+        array(7) {
+          ["start"]=>
+          string(1) "0"
+          ["q"]=>
+          string(3) "*:*"
+          ["json.nl"]=>
+          string(3) "map"
+          ["wt"]=>
+          string(4) "json"
+          ["fq"]=>
+          string(18) "sf_meta_class:Post"
+          ["version"]=>
+          string(3) "1.2"
+          ["rows"]=>
+          string(2) "30"
+        }
+      }
+      ["response"]=>
+      array(3) {
+        ["numFound"]=>
+        int(1)
+        ["start"]=>
+        int(0)
+        ["docs"]=>
+        array(1) {
+          [0]=>
+          array(7) {
             ["sf_unique_id"]=>
-            string(8) "Post_598"
+            string(6) "Post_9"
             ["sf_meta_class"]=>
             string(4) "Post"
             ["sf_meta_id"]=>
-            int(598)
+            int(9)
             ["timestamp"]=>
-            string(24) "2009-12-30T10:34:44.458Z"
+            string(24) "2010-02-06T15:16:30.523Z"
             ["title_t"]=>
             array(1) {
               [0]=>
-                string(28) "gloubigoulba glop glop"
+              string(5) "title"
             }
-      …
-
+            ["sf_text"]=>
+            array(2) {
+              [0]=>
+              string(5) "title"
+              [1]=>
+              string(4) "body"
+            }
+            ["body_t"]=>
+            array(1) {
+              [0]=>
+              string(4) "body"
+            }
+          }
+        }
+      }
+    }
 
 You can also set the `offset` and `limit` parameters.
 
@@ -280,6 +319,7 @@ You can also do this from the command line.
     $ php symfony solr:reset-index Post
     $ php symfony help solr:reset-index
 
+This method will only remove objects from the current class (here: Post).
 
 ### Transactions ###
 
