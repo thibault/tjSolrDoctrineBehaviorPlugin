@@ -90,7 +90,7 @@ Then you can start the daemon:
 
 Check this URL to be sure everything went fine.
 
-    [http://localhost:8983/solr/admin/](http://localhost:8983/solr/admin/)
+[http://localhost:8983/solr/admin/](http://localhost:8983/solr/admin/)
 
 
 ## How to use ? ##
@@ -412,7 +412,7 @@ Here's how you can easily run the plugin test suite :
 ## Thanks ##
 
 I'd wish to thank the following persons for contributing to this plugin :
-  * Guillaume Roques
+   * Guillaume Roques
 
 ## TODO ##
 
