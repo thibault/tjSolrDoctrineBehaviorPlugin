@@ -30,7 +30,7 @@ class Search_Handler_Solr implements Search_Handler_Interface
   /**
    * Builds an Apache_Solr_Document to pass to Apache_Solr_Service
    **/
-  public function buildDocument(array $document)
+  private function buildDocument(array $document)
   {
     $doc = new Apache_Solr_Document();
 
