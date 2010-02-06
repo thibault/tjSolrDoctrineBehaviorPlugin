@@ -213,6 +213,12 @@ Once you have attached the behavior to your model, it will provide a "search" me
     // search only in "title" field
     $results = Doctrine::getTable('Post')->search('title_t:test');
 
+    // You can set the offset and limit params
+    $results = Doctrine::getTable('Post')->search('*:*', 0, 10);
+
+    // search can take extra params
+    $results = Doctrine::getTable('Post')->search('*:*', 0, 10, array('sort' => 'score desc', 'fl' => '*,score'));
+
 The `search` methods retuns a php array corresponding to the Solr xml response.
 
     [php]
@@ -283,12 +289,6 @@ The `search` methods retuns a php array corresponding to the Solr xml response.
         }
       }
     }
-
-You can also set the `offset` and `limit` parameters.
-
-    [php]
-    $results = Doctrine::getTable('Post')->search('*:*', 0, 10);
-
 
 Instead of a dummy php array, the plugin can also generate a Doctrine_Query object,
 which you can manipulate as usual. For instance, you can modify sorting options, paginate the list,
@@ -388,6 +388,11 @@ Here's how you can easily run the plugin test suite :
     or, if the sfTaskExtraPlugin is not installed :
 
         $ php plugins/tjSolrDoctrineBehaviorPlugin/test/bin/prove.php
+
+## Thanks ##
+
+I'd wish to thank the following persons for contributing to this plugin :
+  * Guillaume Roques
 
 ## TODO ##
 
