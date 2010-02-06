@@ -165,6 +165,26 @@ You can configure this mapping in the Doctrine schema :
 
 Look into the "dynamicField" entries in the Solr's schema to see available patterns.
 
+### Indexing virtual fields ###
+
+Thanks to the Doctrine magic, it is very easy to index virtual fields. All you have to do is
+to add a custom getter in the model class. This way, you can even index some relations fields.
+
+    [yml]
+    Post:
+      actAs:
+        Solr:
+          fields: [ title, body, threadTitle ]
+          fieldmap: { title: title_t, body: body_t, threadTitle: thread_t }
+
+Add this getter in the Post class :
+
+    [php]
+    public function getThreadTitle()
+    {
+      return $this->getThread()->getTitle();
+    }
+
 ### Connecting to Solr ###
 
 This plugins uses the default Solr connexion parameters. You can override them in the doctrine schema :
