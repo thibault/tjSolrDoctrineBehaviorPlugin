@@ -68,15 +68,17 @@ $handler->verify();
 // @Test: createSearchQuery returns a Doctrine_Query object
 
 $results = array(
-  'docs' => array(
-    0 => array(
-      'sf_meta_id' => 1,
-    ),
-    3 => array(
-      'sf_meta_id' => 2,
-    ),
-    2 => array(
-      'sf_meta_id' => 3,
+  'response' => array(
+    'docs' => array(
+      0 => array(
+        'sf_meta_id' => 1,
+      ),
+      3 => array(
+        'sf_meta_id' => 2,
+      ),
+      2 => array(
+        'sf_meta_id' => 3,
+      )
     )
   )
 );
