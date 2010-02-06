@@ -8,11 +8,11 @@
 include_once dirname(__FILE__).'/../../../bootstrap/bootstrap.php';
 
 LimeAnnotationSupport::enable();
-$t = new lime_test(3);
+$t = new lime_test(5);
 
 // @Before
 
-$handler = new Search_Handler_Solr('localhost', '8389', '/solr');
+$handler = new Search_Handler_Solr('localhost', '8983', '/solr');
 $documentArray = array(
   'title' => array(
     'value' => 'my title',
@@ -44,3 +44,8 @@ $t->is($field['value'][0], "my title");
 
 $t->is($document->getFieldBoost('title'), 2.33);
 
+// @Test: search() Check that the result correspond to the Solr value
+
+$result = $handler->search('*:*');
+$t->ok(is_array($result));
+$t->ok(isset($result['response']));

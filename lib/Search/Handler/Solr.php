@@ -79,9 +79,10 @@ class Search_Handler_Solr implements Search_Handler_Interface
   /**
    * @see Search_Handler_Interface::query()
    **/
-  public function search($query, $offset, $limit, $params)
+  public function search($query, $offset = 0, $limit = 10, $params = array())
   {
-    return $this->_service->search($query, $offset, $limit, $params);
+    $result = $this->_service->search($query, $offset, $limit, $params);
+    return json_decode($result->getRawResponse(), true);
   }
 
   /**

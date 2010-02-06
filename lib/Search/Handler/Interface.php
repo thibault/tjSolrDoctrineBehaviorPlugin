@@ -45,7 +45,7 @@ Interface Search_Handler_Interface
    * @param integer $limit
    * @param array $params Additional parameters
    **/
-  public function search($query, $offset, $limit, $params);
+  public function search($query, $offset = 0, $limit = 10, $params = array());
 
   /**
    * Send a commit message to the search engine
