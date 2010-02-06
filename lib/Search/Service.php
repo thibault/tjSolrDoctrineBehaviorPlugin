@@ -3,7 +3,7 @@
 /**
  * Performs the common search operations
  *
- * Communication with the search engine is delegated to a Search_Handler
+ * Actual communication with the search engine is delegated to a Search_Handler
  *
  * @package     tjSolrDoctrineBehaviorPlugin
  * @subpackage  Search
