@@ -6,7 +6,7 @@
 include_once dirname(__FILE__).'/../../bootstrap/bootstrap.php';
 
 LimeAnnotationSupport::enable();
-$t = new lime_test(0);
+$t = new lime_test(11);
 
 // @Before
 
