@@ -3,51 +3,68 @@
 /**
  * Doctrine_Template_Listener_Solr tests.
  */
-include dirname(__FILE__).'/../../../../bootstrap/bootstrap.php';
+include_once dirname(__FILE__).'/../../../../bootstrap/bootstrap.php';
 
-$t = new lime_test(4);
+LimeAnnotationSupport::enable();
+$t = new lime_test(10);
 
-// We need access to Solr to run our tests. Ensure it is running
-if(!Doctrine::getTable('Post')->isSearchAvailable())
-  die();
+// @Before
 
-// Ensure we're working on a clean index
-Doctrine::getTable('Post')->deleteIndex();
-Doctrine::loadData(dirname(__FILE__).'/../../../fixtures/project/data/fixtures');
+$handler = $t->mock('Search_Handler_Interface');
 
-// Check if index is updated when the object is
-$t->comment('-> postInsert');
 $post = new Post();
-$post->title = 'foobarbaz ';
-$post->body = 'this is my body';
+$post->setTitle('title');
+$post->setBody('body');
 $post->Thread = new Thread();
 $post->Thread->title = 'test thread';
 $post->save();
 
-$otherPost = new Post();
-$otherPost->title = 'foobar';
-$otherPost->body = 'This is a gloubigoulba body';
-$otherPost->Thread = $post->Thread;
-$otherPost->save();
+Doctrine::getTable('Post')->setSearchHandler($handler);
 
-$results = Doctrine::getTable('Post')->search('foobarbaz');
-$t->is($results->numFound, 1,
-  '::postInsert() new objects are automaticaly indexed when saved');
+// @After
 
-$post->title = 'bazbarfoo';
+$handler->reset();
+unset($handler);
+unset($post);
+
+
+// @Test: Check if index is updated when a new object is created
+
+
+$handler->any('unindex')->once();
+$handler->commit()->once();
+$handler->any('index')->once();
+$handler->commit()->once();
+$handler->replay();
+
+$post2 = new Post();
+$post2->setTitle('title');
+$post2->setBody('body');
+$post2->Thread = new Thread();
+$post2->Thread->title = 'test thread';
+$post2->save();
+
+$handler->verify();
+
+// @Test: Check if index is updated when the object is
+
+$handler->any('unindex')->once();
+$handler->commit()->once();
+$handler->any('index')->once();
+$handler->commit()->once();
+$handler->replay();
+
+$post->title = 'changed title';
 $post->save();
 
-$t->comment('-> postUpdate');
-$results = Doctrine::getTable('Post')->search('bazbarfoo');
-$t->is($results->numFound, 1,
-  '::postUpdate() existing objects are re-indexed when updated');
+$handler->verify();
 
-$results = Doctrine::getTable('Post')->search('foobarbaz');
-$t->is($results->numFound, 0,
-  '::postUpdate() existing data is cleared from index before reindexing');
+// @Test: Check if index is updated when the object is deleted
 
-$t->comment('-> preDelete');
+$handler->any('unindex')->once();
+$handler->commit()->once();
+$handler->replay();
+
 $post->delete();
-$results = Doctrine::getTable('Post')->search('bazbarfoo');
-$t->is($results->numFound, 0,
-  '::preDelete() objects are removed from index when deleted');
+
+$handler->verify();
