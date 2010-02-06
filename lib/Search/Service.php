@@ -91,10 +91,7 @@ class Search_Service
       'fq' => "sf_meta_class:$class"
     );
 
-    $results = $this->_searchHandler->search($search, $offset, $limit, $params);
-    $response = json_decode($results->getRawResponse());
-
-    return $response->response;
+    return $this->_searchHandler->search($search, $offset, $limit, $params);
   }
 
   /**
