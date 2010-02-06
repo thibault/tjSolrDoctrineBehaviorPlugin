@@ -113,7 +113,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
   }
 
   /**
-    * Remove every indexed documents
+    * Remove every indexed documents from the invoker class
     *
     * handle with care
    **/
