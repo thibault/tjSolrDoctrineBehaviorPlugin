@@ -41,6 +41,7 @@ class Doctrine_Template_Listener_Solr extends Doctrine_Record_Listener
     $invoker = $event->getInvoker();
 
     // Delete the doc from index if it already exists
+    // @todo always executed are we are in postInsert.
     if(!$invoker->isNew())
       $invoker->deleteFromIndex();
 
