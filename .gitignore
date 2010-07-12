@@ -1,0 +1,3 @@
+.DS_Store
+lib/vendor/solr/solr/data/*
+lib/vendor/solr/logs/*
