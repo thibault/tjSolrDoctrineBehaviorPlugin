@@ -30,6 +30,7 @@
        You may also set this to false using by setting the system property:
          -Dsolr.abortOnConfigurationError=false
      -->
+
   <abortOnConfigurationError>${solr.abortOnConfigurationError:true}</abortOnConfigurationError>
 
   <!-- lib directives can be used to instruct Solr to load an Jars identified
@@ -498,6 +499,15 @@
         -->
      </lst>
   </requestHandler>
+
+
+	<requestHandler name="/dataimport" class="org.apache.solr.handler.dataimport.DataImportHandler">
+    <lst name="defaults">
+      <str name="config">/Users/sobert/Sites/playfm/config/solr/data-config.xml</str>
+    </lst>
+  </requestHandler>
+
+
 
 <!-- Please refer to http://wiki.apache.org/solr/SolrReplication for details on configuring replication -->
 <!-- remove the <lst name="master"> section if this is just a slave -->
