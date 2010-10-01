@@ -62,7 +62,7 @@ Once your configuration is correct, you can start Solr. Of course, you need a ja
 
 ### Solr in a production environment ###
 
-In a production environment, you should run Solr as a daemon. The right way to do depends on your server's
+In a production environment, you should run Solr as a daemon. The right way to do it depends on your server's
 system, however, some startup scripts are included in the `lib/vendor/scripts` directory.
 
 On a debian server :
@@ -71,12 +71,12 @@ On a debian server :
     $ chmod 755 /etc/init.d/solr
     $ update-rc.d solr defaults
 
-Before running Solr, just set the PROJECT_NAME value to your symfony project directory.
+Before running Solr, just set the PROJECT_NAME value to your symfony project directory at the top of your solr script.
 
     PROJECT_NAME=mysfproject
 
-The Solr index will be created in you `data` dir, and the logs will go in `log` dir.
-You have to create one last directory before we're ready.
+The Solr index will be created in your `data` dir, and the logs will go in `log` dir.
+You have to create one last directory before we're ready (tjSolrDoctrineBehaviorPlugin/lib/vendor/solr/logs).
 
     $ mkdir logs/solr
 
@@ -134,7 +134,8 @@ Each time a Post object is created/updated/deleted, the Solr index will be autom
 ### Field mapping ###
 
 In the previous example, the plugin will try to index the title and body fields into Solr.
-You have to manualy define those names in the Solr schema, or indexing will fail :
+You have to manualy define those names in the Solr schema
+(in tjSolrDoctrineBehaviorPlugin/lib/vendor/solr/solr/conf/schema.xml), or indexing will fail :
 
     [xml]
     <field name="title" type="text" indexed="true" stored="true" multiValued="false" />
@@ -170,6 +171,8 @@ Look into the "dynamicField" entries in the Solr's schema to see available patte
 Thanks to the Doctrine magic, it is very easy to index virtual fields. All you have to do is
 to add a custom getter in the model class. This way, you can even index some relations fields.
 
+Schema using dynamic fields :
+
     [yml]
     Post:
       actAs:
@@ -177,6 +180,9 @@ to add a custom getter in the model class. This way, you can even index some rel
           fields: [ title, body, threadTitle ]
           fieldmap: { title: title_t, body: body_t, threadTitle: thread_t }
 
+You aren't required to use dynamic fields when defining virtual fields
+to index.          
+          
 Add this getter in the Post class :
 
     [php]
@@ -185,6 +191,19 @@ Add this getter in the Post class :
       return $this->getThread()->getTitle();
     }
 
+Indexing n:m relationships :
+
+    [php]
+    public function getThreadTitle()
+    {
+      $thrArray = array();
+      foreach ($this->getThreads() as $thread)
+      {
+            $thrArray[] = $thread->getTitle();
+      }
+      return implode($thrArray, ', ');
+    }    
+    
 ### Connecting to Solr ###
 
 This plugins uses the default Solr connexion parameters. You can override them in the doctrine schema :
