@@ -62,6 +62,7 @@ EOF;
     foreach($objects as $object) {
         $object->deleteFromIndex();
         $object->addToIndex();
+        $object->free();
     }
     
     $this->logSection('solr', 'Index has been rebuilt');
