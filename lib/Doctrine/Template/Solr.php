@@ -22,6 +22,11 @@ class Doctrine_Template_Solr extends Doctrine_Template
    * @var Search_Service $_search This is the way to handle Solr communication
    **/
   private $_search;
+  
+  /**
+   * @var string $_sf_meta_class A String representing the meta class of the model
+   **/
+  private $_sf_meta_class;
 
   public function setTableDefinition()
   {
@@ -35,7 +40,27 @@ class Doctrine_Template_Solr extends Doctrine_Template
       $this->_options['port'],
       $this->_options['path']
     );
+    
     $this->_search = new Search_Service($searchHandler);
+  }
+
+  /**
+   * Returns the meta class which will be set as the sf_meta_class solr field
+   * 
+   * Defaults to the model classname. When a meta_field option is set, this
+   * value will be retrieved from the object field set in 'meta_field'
+   **/
+  private function getMetaClass() {
+    
+    if (isset($this->_sf_meta_class)) 
+      return $this->sf_meta_class;
+      
+    if (isset($this->_options['meta_field']))
+      $this->_sf_meta_class = $this->getInvoker()->get($this->_options['meta_field']);
+    else $this->_sf_meta_class = get_class($this->getInvoker());
+    
+    return $this->_sf_meta_class;
+    
   }
 
   /**
@@ -61,7 +86,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function getUniqueId()
   {
-    return sprintf('%s_%s', get_class($this->getInvoker()), $this->getInvoker()->getId());
+    return sprintf('%s_%s', $this->getMetaClass(), $this->getInvoker()->getId());
   }
 
   /**
@@ -94,7 +119,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
     $document[$this->_options['key']]['value'] = $this->getUniqueId();
 
     // set meta data
-    $document['sf_meta_class']['value'] = get_class($invoker);
+    $document['sf_meta_class']['value'] = $this->sf_meta_class;
     $document['sf_meta_id']['value'] = $invoker->getId();
 
     // Set others fields
@@ -122,7 +147,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function deleteIndexTableProxy()
   {
-    $this->_search->deleteIndex(get_class($this->getInvoker()));
+    $this->_search->deleteIndex($this->getMetaClass());
   }
 
   /**
@@ -131,8 +156,8 @@ class Doctrine_Template_Solr extends Doctrine_Template
    * @return array The solr response as a php array
    **/
   public function searchTableProxy($search, $offset = 0, $limit = 30, $params = array())
-  {
-    return $this->_search->search($search, $offset, $limit, get_class($this->getInvoker()), $params);
+  {    
+    return $this->_search->search($search, $offset, $limit, $this->getMetaClass(), $params);
   }
 
   /**
