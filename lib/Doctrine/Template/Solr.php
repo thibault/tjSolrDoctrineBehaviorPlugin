@@ -119,7 +119,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
     $document[$this->_options['key']]['value'] = $this->getUniqueId();
 
     // set meta data
-    $document['sf_meta_class']['value'] = $this->sf_meta_class;
+    $document['sf_meta_class']['value'] = $this->getMetaClass();
     $document['sf_meta_id']['value'] = $invoker->getId();
 
     // Set others fields
