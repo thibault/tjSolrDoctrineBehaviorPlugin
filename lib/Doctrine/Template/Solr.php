@@ -165,9 +165,9 @@ class Doctrine_Template_Solr extends Doctrine_Template
    *
    * @return Doctrine_Query
    **/
-  public function createSearchQueryTableProxy($search, $limit = 256)
+  public function createSearchQueryTableProxy($search, $offset = 0, $limit = 30, $params = array())
   {
-    $response = $this->getTable()->search($search, 0, $limit);
+    $response = $this->getTable()->search($search, $offset, $limit, $params);
 
     $pks = array();
     foreach($response['response']['docs'] as $doc)
@@ -193,6 +193,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
     return $q;
   }
+  
 
   /**
     * Starts a transaction for indexing
