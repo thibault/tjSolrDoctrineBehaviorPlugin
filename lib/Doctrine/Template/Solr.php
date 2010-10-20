@@ -53,7 +53,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
   private function getMetaClass() {
     
     if (isset($this->_sf_meta_class)) 
-      return $this->sf_meta_class;
+      return $this->_sf_meta_class;
       
     if (isset($this->_options['meta_field']))
       $this->_sf_meta_class = $this->getInvoker()->get($this->_options['meta_field']);
