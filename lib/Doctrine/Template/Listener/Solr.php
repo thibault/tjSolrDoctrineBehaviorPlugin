@@ -28,23 +28,42 @@ class Doctrine_Template_Listener_Solr extends Doctrine_Record_Listener
 
   public function preDelete(Doctrine_Event $event)
   {
-    $invoker = $event->getInvoker();
 
-    $invoker->deleteFromIndex();
+    try {
+      $invoker = $event->getInvoker();      
+      $invoker->deleteFromIndex();
+    } catch (Exception $e) {
+      $this->notifyException($e);
+    }
+
   }
 
   /**
    * Index invoker fields into Solr
    **/
   protected function updateIndex($event)
-  {
-    $invoker = $event->getInvoker();
+  {    
+    try {
+      $invoker = $event->getInvoker();
 
-    // Delete the doc from index if it already exists
-    // @todo always executed are we are in postInsert.
-    if(!$invoker->isNew())
-      $invoker->deleteFromIndex();
+      // Delete the doc from index if it already exists
+      // @todo always executed are we are in postInsert.
+      if(!$invoker->isNew())
+        $invoker->deleteFromIndex();
 
-    $invoker->addToIndex();
+      $invoker->addToIndex();
+      
+    } catch (Exception $e) {
+      $this->notifyException($e);
+    }
+  }
+  
+  private function notifyException(Exception $e) 
+  {     
+    if (sfContext::hasInstance()) {
+      sfContext::getInstance()->getEventDispatcher()->notify(new sfEvent($event->getInvoker(), 'solr.indexing_error', array('exception' => $e)));
+    } else {
+      throw $e;
+    }    
   }
 }
