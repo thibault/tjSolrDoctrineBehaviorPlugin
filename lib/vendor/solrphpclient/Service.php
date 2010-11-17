@@ -118,6 +118,7 @@ class Apache_Solr_Service
 	const UPDATE_SERVLET = 'update';
 	const SEARCH_SERVLET = 'select';
 	const THREADS_SERVLET = 'admin/threads';
+	const SPELL_SERVLET = 'spell';
 
 	/**
 	 * Server identification strings
@@ -295,6 +296,7 @@ class Apache_Solr_Service
 		$this->_pingUrl = $this->_constructUrl(self::PING_SERVLET);
 		$this->_updateUrl = $this->_constructUrl(self::UPDATE_SERVLET, array('wt' => self::SOLR_WRITER ));
 		$this->_searchUrl = $this->_constructUrl(self::SEARCH_SERVLET);
+		$this->_spellUrl  = $this->_constructUrl(self::SPELL_SERVLET);
 		$this->_threadsUrl = $this->_constructUrl(self::THREADS_SERVLET, array('wt' => self::SOLR_WRITER ));
 
 		$this->_urlsInited = true;
@@ -972,4 +974,58 @@ class Apache_Solr_Service
 			throw new Exception("Unsupported method '$method', please use the Apache_Solr_Service::METHOD_* constants");
 		}
 	}
+	
+	
+	/**
+	 * Spell correction interface
+	 * @param string $query the raw query string
+	 * @param array $params parameters for spell correction
+	 * @param unknown_type $method
+	 */
+    public function spell($query, $params = array(), $method = self::METHOD_GET)
+    {
+
+        if (!is_array($params))
+        {
+            $params = array();
+        }
+        
+        $params['spellcheck'] = (isset($params['spellcheck'])) ? $params['spellcheck'] : 'true';
+        $params['spellcheck.build'] = (isset($params['spellcheck.build'])) ? $params['spellcheck.build'] : 'true';
+        $params['spellcheck.collate'] = (isset($params['spellcheck.collate'])) ? $params['spellcheck.collate'] : 'true';
+
+        // construct our full parameters
+        // sending the version is important in case the format changes
+        $params['version'] = self::SOLR_VERSION;
+
+        // common parameters in this interface
+        $params['wt'] = self::SOLR_WRITER;
+        $params['json.nl'] = $this->_namedListTreatment;
+
+        $params['q'] = $query;
+
+        // use http_build_query to encode our arguments because its faster
+        // than urlencoding all the parts ourselves in a loop
+        $queryString = http_build_query($params, null, $this->_queryStringDelimiter);
+
+        // because http_build_query treats arrays differently than we want to, correct the query
+        // string by changing foo[#]=bar (# being an actual number) parameter strings to just
+        // multiple foo=bar strings. This regex should always work since '=' will be urlencoded
+        // anywhere else the regex isn't expecting it
+        $queryString = preg_replace('/%5B(?:[0-9]|[1-9][0-9]+)%5D=/', '=', $queryString);
+
+        if ($method == self::METHOD_GET)
+        {
+            return $this->_sendRawGet($this->_spellUrl . $this->_queryDelimiter . $queryString);
+        }
+        else if ($method == self::METHOD_POST)
+        {
+            return $this->_sendRawPost($this->_spellUrl, $queryString, FALSE, 'application/x-www-form-urlencoded');
+        }
+        else
+        {
+            throw new Exception("Unsupported method '$method', please use the Apache_Solr_Service::METHOD_* constants");
+        }
+    }
+	
 }
