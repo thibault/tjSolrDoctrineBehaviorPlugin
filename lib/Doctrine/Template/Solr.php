@@ -43,6 +43,26 @@ class Doctrine_Template_Solr extends Doctrine_Template
     
     $this->_search = new Search_Service($searchHandler);
   }
+  
+  
+  public function getSolrHostTableProxy() {
+    
+    return $this->_options['host'];
+    
+  }
+  
+  
+  public function getSolrPortTableProxy() {
+    
+    return $this->_options['port'];    
+    
+  }
+  
+  public function getSolrPathTableProxy() {
+    
+    return $this->_options['path'];
+    
+  }
 
   /**
    * Returns the meta class which will be set as the sf_meta_class solr field
