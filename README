@@ -495,7 +495,6 @@ I'd wish to thank the following persons for contributing to this plugin :
 
 Here's some ideas for further developpements:
 
-* Add an option to allow or not objects modifications when solr is unavailable
 * Compatibility with the i18n behavior
 * Add geolocation search
 * add a moreLikeThis() function
