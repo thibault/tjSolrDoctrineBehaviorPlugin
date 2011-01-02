@@ -1,1 +1,2 @@
 test/fixtures/project/cache
+lib/vendor/solr/solr/conf/dataimport.properties

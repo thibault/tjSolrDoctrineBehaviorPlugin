@@ -929,6 +929,12 @@
     </lst>
   </requestHandler>
 
+  <requestHandler name="/dataimport" class="org.apache.solr.handler.dataimport.DataImportHandler">
+    <lst name="defaults">
+      <str name="config">data-import.xml</str>
+    </lst>
+  </requestHandler>
+
   <highlighting>
    <!-- Configure the standard fragmenter -->
    <!-- This could most likely be commented out in the "default" case -->

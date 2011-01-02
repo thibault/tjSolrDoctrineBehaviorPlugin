@@ -1,0 +1,14 @@
+<dataConfig>
+  <dataSource type="JdbcDataSource"
+              driver="com.mysql.jdbc.Driver"
+              url="jdbc:mysql://localhost/solr_doctrine_behavior_test"
+              user="test"
+              password=""/>
+  <document>
+    <entity name="post" transformer="TemplateTransformer"
+            query="SELECT id, id AS sf_meta_id, title AS title_t, body AS body_t FROM post">
+      <field column="sf_unique_id" template="Post_${post.id}" />
+      <field column="sf_meta_class" template="Post" />
+    </entity>
+  </document>
+</dataConfig>
