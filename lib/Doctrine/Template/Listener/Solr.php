@@ -69,13 +69,13 @@ class Doctrine_Template_Listener_Solr extends Doctrine_Record_Listener
    **/
   private function notifyException(Exception $e, sfDoctrineRecord $record)
   {
-    if (sfContext::hasInstance())
+    $event = sfContext::getInstance()->getEventDispatcher()->notifyUntil(new sfEvent($record, 'solr.indexing_error', array('exception' => $e)));
+
+    if ($event->isProcessed())
     {
-      sfContext::getInstance()->getEventDispatcher()->notify(new sfEvent($record, 'solr.indexing_error', array('exception' => $e)));
+        return;
     }
-    else
-    {
-      throw $e;
-    }
+
+    throw $e;
   }
 }
