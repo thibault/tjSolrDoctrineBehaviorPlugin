@@ -48,7 +48,7 @@ EOF;
     $databaseManager = new sfDatabaseManager($this->configuration);
 
     $confirm = $this->askConfirmation(
-      'This will rebuild everything in the Solr index. Are you sure you want to proceed? (y/N)',
+      "\n This will rebuild everything in the Solr index. Are you sure you want to proceed? (y/N)\n",
       'QUESTION',
       false);
     if(!$confirm)

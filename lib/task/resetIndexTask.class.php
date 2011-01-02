@@ -46,7 +46,7 @@ EOF;
     $databaseManager = new sfDatabaseManager($this->configuration);
 
     $confirm = $this->askConfirmation(
-      'This will DELETE everything from the Solr index. Are you sure you want to proceed? (y/N)',
+      "\n This will DELETE everything from the Solr index. Are you sure you want to proceed? (y/N)\n",
       'QUESTION',
       false);
     if(!$confirm)
