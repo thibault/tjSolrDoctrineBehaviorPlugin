@@ -192,7 +192,7 @@
     <Ref id="RequestLog">
       <Set name="requestLog">
         <New id="RequestLogImpl" class="org.mortbay.jetty.NCSARequestLog">
-          <Arg><SystemProperty name="jetty.logs" default="./logs"/>/yyyy_mm_dd.request.log</Arg>
+          <Arg><SystemProperty name="jetty.logs" default="../../../../../log/solr"/>/yyyy_mm_dd.request.log</Arg>
           <Set name="retainDays">90</Set>
           <Set name="append">true</Set>
           <Set name="extended">false</Set>
@@ -207,6 +207,11 @@
     <Set name="stopAtShutdown">true</Set>
     <!-- ensure/prevent Server: header being sent to browsers        -->
     <Set name="sendServerVersion">true</Set>
+
+    <Call class="java.lang.System" name="setProperty">
+        <Arg>java.util.logging.config.file</Arg>
+        <Arg>logging.properties</Arg>
+    </Call>
 
 </Configure>
 
