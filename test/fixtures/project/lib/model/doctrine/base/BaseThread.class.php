@@ -16,7 +16,7 @@
  * @package    ##PROJECT_NAME##
  * @subpackage model
  * @author     ##AUTHOR_NAME##
- * @version    SVN: $Id: Builder.php 6820 2009-11-30 17:27:49Z jwage $
+ * @version    SVN: $Id: Builder.php 7490 2010-03-29 19:53:27Z jwage $
  */
 abstract class BaseThread extends sfDoctrineRecord
 {
@@ -26,7 +26,7 @@ abstract class BaseThread extends sfDoctrineRecord
         $this->hasColumn('title', 'string', 255, array(
              'type' => 'string',
              'notnull' => true,
-             'length' => '255',
+             'length' => 255,
              ));
     }
 
