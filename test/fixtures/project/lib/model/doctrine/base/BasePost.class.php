@@ -52,6 +52,7 @@ abstract class BasePost extends sfDoctrineRecord
              'foreign' => 'id',
              'onDelete' => 'CASCADE'));
 
+        $timestampable0 = new Doctrine_Template_Timestampable();
         $solr0 = new Doctrine_Template_Solr(array(
              'fields' => 
              array(
@@ -68,6 +69,7 @@ abstract class BasePost extends sfDoctrineRecord
               'title' => 2,
              ),
              ));
+        $this->actAs($timestampable0);
         $this->actAs($solr0);
     }
 }

@@ -15,17 +15,21 @@ abstract class BasePostForm extends BaseFormDoctrine
   public function setup()
   {
     $this->setWidgets(array(
-      'id'        => new sfWidgetFormInputHidden(),
-      'thread_id' => new sfWidgetFormDoctrineChoice(array('model' => $this->getRelatedModelName('Thread'), 'add_empty' => false)),
-      'title'     => new sfWidgetFormInputText(),
-      'body'      => new sfWidgetFormTextarea(),
+      'id'         => new sfWidgetFormInputHidden(),
+      'thread_id'  => new sfWidgetFormDoctrineChoice(array('model' => $this->getRelatedModelName('Thread'), 'add_empty' => false)),
+      'title'      => new sfWidgetFormInputText(),
+      'body'       => new sfWidgetFormTextarea(),
+      'created_at' => new sfWidgetFormDateTime(),
+      'updated_at' => new sfWidgetFormDateTime(),
     ));
 
     $this->setValidators(array(
-      'id'        => new sfValidatorChoice(array('choices' => array($this->getObject()->get('id')), 'empty_value' => $this->getObject()->get('id'), 'required' => false)),
-      'thread_id' => new sfValidatorDoctrineChoice(array('model' => $this->getRelatedModelName('Thread'))),
-      'title'     => new sfValidatorString(array('max_length' => 255)),
-      'body'      => new sfValidatorString(),
+      'id'         => new sfValidatorChoice(array('choices' => array($this->getObject()->get('id')), 'empty_value' => $this->getObject()->get('id'), 'required' => false)),
+      'thread_id'  => new sfValidatorDoctrineChoice(array('model' => $this->getRelatedModelName('Thread'))),
+      'title'      => new sfValidatorString(array('max_length' => 255)),
+      'body'       => new sfValidatorString(),
+      'created_at' => new sfValidatorDateTime(),
+      'updated_at' => new sfValidatorDateTime(),
     ));
 
     $this->widgetSchema->setNameFormat('post[%s]');

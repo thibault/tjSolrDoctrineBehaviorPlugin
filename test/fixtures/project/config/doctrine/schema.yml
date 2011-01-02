@@ -6,6 +6,7 @@ Thread:
 
 Post:
   actAs:
+    Timestampable: ~
     Solr:
       fields: [ title, body ]
       fieldmap: { title: title_t, body: body_t }
