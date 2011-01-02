@@ -36,7 +36,7 @@ class Doctrine_Template_Listener_Solr extends Doctrine_Record_Listener
     }
     catch (Exception $e)
     {
-      $this->notifyException($e);
+      $this->notifyException($e, $invoker);
     }
 
   }
@@ -60,18 +60,18 @@ class Doctrine_Template_Listener_Solr extends Doctrine_Record_Listener
     }
     catch (Exception $e)
     {
-      $this->notifyException($e);
+      $this->notifyException($e, $invoker);
     }
   }
 
   /**
    * Use event dispatcher to notify a solr indexing exception
    **/
-  private function notifyException(Exception $e)
+  private function notifyException(Exception $e, sfDoctrineRecord $record)
   {
     if (sfContext::hasInstance())
     {
-      sfContext::getInstance()->getEventDispatcher()->notify(new sfEvent($event->getInvoker(), 'solr.indexing_error', array('exception' => $e)));
+      sfContext::getInstance()->getEventDispatcher()->notify(new sfEvent($record, 'solr.indexing_error', array('exception' => $e)));
     }
     else
     {
