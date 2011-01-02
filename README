@@ -424,7 +424,7 @@ Here's how you can easily run the plugin test suite :
 
     If you want to use an existing database, you have to configure the database connexion by yourself
 
-        $ php plugins/tjSolrDoctrineBehaviorPlugin/test/fixtures/project/symfony configure:database --env=test
+        $ php plugins/tjSolrDoctrineBehaviorPlugin/test/fixtures/project/symfony configure:database --env=test 'mysql:host=localhost;dbname=solr_doctrine_behavior_test'
 
   * build the bootstrap project. You don't have to load the fixtures, this will be done on time.
 
