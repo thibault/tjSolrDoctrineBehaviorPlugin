@@ -25,14 +25,15 @@ class rebuildIndexTask extends sfBaseTask
     $this->addOptions(array(
       new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev'),
       new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', null),
-      // add your own options here
+      new sfCommandOption('offset', null, sfCommandOption::PARAMETER_REQUIRED, 'The offset', 0),
+      new sfCommandOption('limit', null, sfCommandOption::PARAMETER_REQUIRED, 'The limit', 20)
     ));
 
     $this->namespace        = 'solr';
     $this->name             = 'rebuild-index';
     $this->briefDescription = 'rebuild the solr index';
     $this->detailedDescription = <<<EOF
-The [rebuild-index|INFO] deletes the entire solr index.
+The [rebuild-index|INFO] rebuilds the entire solr index.
 Call it with:
 
   [php symfony solr:rebuild-index ModelClass|INFO]
@@ -57,14 +58,18 @@ EOF;
     }
 
     $model = $arguments['model'];
-    
-    $objects = Doctrine_Core::getTable($model)->findAll();
+    $objects = Doctrine_Core::getTable($model)->createQuery('m')
+        ->limit($options['limit'])
+        ->offset($options['offset'])
+        ->execute()
+    ;
+
     foreach($objects as $object) {
         $object->deleteFromIndex();
         $object->addToIndex();
         $object->free();
     }
-    
+
     $this->logSection('solr', 'Index has been rebuilt');
   }
 }

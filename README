@@ -354,7 +354,7 @@ There is a last available method to performs a search. You can use the `solr:sea
     $ php symfony solr:search Post "my query"
     $ php symfony help solr:search
 
-### reset index ###
+### Reset index ###
 
 Sometimes, you may want to reset the index and clear all indexed objects. There is a function to do this.
 
@@ -369,6 +369,16 @@ You can also do this from the command line.
     $ php symfony help solr:reset-index
 
 This method will only remove objects from the current class (here: Post).
+
+### Rebuild index ###
+
+A task is available to reindex all objects.
+
+    $ php symfony solr:rebuild-index Post
+
+If you have a lot of objects, you can also set an offset and a limit parameters.
+
+    $ php symfony solr:rebuild-index Post --offset=5 --limit=10
 
 ### Transactions ###
 
