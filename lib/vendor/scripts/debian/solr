@@ -38,9 +38,6 @@ SOLR_HOME="$PROJECT_DIR/plugins/tjSolrDoctrineBehaviorPlugin/lib/vendor/solr"
 # The data directory
 SOLR_DATA="$PROJECT_DIR/data/solr"
 
-# The log directory
-SOLR_LOG="$PROJECT_DIR/log/solr"
-
 PARAMETERS="-Dsolr.data.dir=$SOLR_DATA"
 PARAMETERS="$PARAMETERS -Djava.util.logging.config.file=$SOLR_HOME/logging.properties"
 PARAMETERS="$PARAMETERS -jar start.jar"
