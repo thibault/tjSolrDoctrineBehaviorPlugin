@@ -141,6 +141,16 @@ Here's an example schema file:
 Rebuild your model, load your data, et voilà!
 Each time a Post object is created/updated/deleted, the Solr index will be automaticaly updated.
 
+Maybe you don't want your content to be indexed real-time (e.g, if you use data import handler, see below) ?
+Set the realtime option to false.
+
+    [yml]
+    Post:
+      actAs:
+        Solr:
+          fields: [ title, body ]
+          realtime: false
+
 ### Field mapping ###
 
 In the previous example, the plugin will try to index the title and body fields into Solr.
@@ -479,6 +489,7 @@ I'd wish to thank the following persons for contributing to this plugin :
 
 * Guillaume Roques
 * Ashton Honnecke
+* Robert Gruendler
 
 ## TODO ##
 

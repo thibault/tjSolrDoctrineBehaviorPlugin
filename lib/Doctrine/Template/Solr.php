@@ -15,7 +15,8 @@ class Doctrine_Template_Solr extends Doctrine_Template
     'key' => 'sf_unique_id',
     'fields' => array(),
     'fieldmap' => array(),
-    'boost' => array()
+    'boost' => array(),
+    'realtime' => true,
   );
 
   /**
@@ -25,7 +26,11 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
   public function setTableDefinition()
   {
-    $this->addListener(new Doctrine_Template_Listener_Solr($this->_options));
+    // Don't setup listener if realtime option is false
+    if ($this->_options['realtime'])
+    {
+        $this->addListener(new Doctrine_Template_Listener_Solr($this->_options));
+    }
   }
 
   public function setUp()

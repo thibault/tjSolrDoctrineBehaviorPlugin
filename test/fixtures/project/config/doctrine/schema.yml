@@ -11,6 +11,7 @@ Post:
       fields: [ title, body ]
       fieldmap: { title: title_t, body: body_t }
       boost: { title: 2 }
+      realtime: true
 
   columns:
     thread_id:

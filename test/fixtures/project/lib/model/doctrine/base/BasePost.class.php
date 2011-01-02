@@ -68,6 +68,7 @@ abstract class BasePost extends sfDoctrineRecord
              array(
               'title' => 2,
              ),
+             'realtime' => true,
              ));
         $this->actAs($timestampable0);
         $this->actAs($solr0);
