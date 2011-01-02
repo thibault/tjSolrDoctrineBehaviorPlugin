@@ -6,7 +6,10 @@
               password=""/>
   <document>
     <entity name="post" transformer="TemplateTransformer"
-            query="SELECT id, id AS sf_meta_id, title AS title_t, body AS body_t FROM post">
+            query="SELECT id, id AS sf_meta_id, title AS title_t, body AS body_t FROM post"
+            deltaQuery="SELECT id FROM post WHERE updated_at > '${dataimporter.last_index_time}'"
+            deltaImportQuery="SELECT id, id AS sf_meta_id, title AS title_t, body AS body_t FROM post WHERE id = '${dataimporter.delta.id}'"
+            >
       <field column="sf_unique_id" template="Post_${post.id}" />
       <field column="sf_meta_class" template="Post" />
     </entity>

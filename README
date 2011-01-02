@@ -225,7 +225,7 @@ This plugins uses the default Solr connexion parameters. You can override them i
           fields: [ title, body ]
           fieldmap: { title: title_t, body: body_t }
           host: localhost
-          post: 8389
+          post: 8983
           path: '/solr'
           …
 
@@ -380,6 +380,25 @@ If you have a lot of objects, you can also set an offset and a limit parameters.
 
     $ php symfony solr:rebuild-index Post --offset=5 --limit=10
 
+
+### Using data import handler ###
+
+Using tasks is not the best way to create or reload the index. Instead, use the
+[data import handler](http://wiki.apache.org/solr/DataImportHandler).
+
+Once correctly configured, use the following uri to generate the index from scratch:
+
+[http://localhost:8983/solr/dataimport?command=full-import](http://localhost:8983/solr/dataimport?command=full-import)
+
+Each time you access this link, the index will be rebuild. Put this line into your crontab to rebuild your index every hour:
+
+    30 * * * * curl -sS http://localhost:8983/solr/dataimport?command=full-import >/tmp/dataimport.log
+
+If performance matters, use the delta-import command:
+
+[http://localhost:8983/solr/dataimport?command=delta-import](http://localhost:8983/solr/dataimport?command=delta-import)
+
+
 ### Transactions ###
 
 Solr supports transactions. By default, the plugins sends a `commit` message after every index operation.
@@ -465,7 +484,6 @@ I'd wish to thank the following persons for contributing to this plugin :
 Here's some ideas for further developpements:
 
 * Add an option to allow or not objects modifications when solr is unavailable
-* Add a task to batch index objects
 * Compatibility with the i18n behavior
 * Add geolocation search
 * add a moreLikeThis() function
