@@ -346,8 +346,9 @@ add other criterias, etc.
     [php]
     $q = Doctrine::getTable('Post')->createSearchQuery('my query');
 
-    $maxResults = 50; // 256 is the function default, for a performance matter
-    $q2 = Doctrine::getTable('Post')->createSearchQuery('my other query', $maxResults);
+    $offset = 10;
+    $limit = 50;
+    $q2 = Doctrine::getTable('Post')->createSearchQuery('my other query', $offset, $limit);
 
 There is a last available method to performs a search. You can use the `solr:search` task from the command line.
 
