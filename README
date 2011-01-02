@@ -55,6 +55,10 @@ And after the fields definition:
     <copyField source="*_t" dest="sf_text" />
     <copyField source="*_s" dest="sf_text" /
 
+Before starting Solr, you need to create the log directory.
+
+    $ mkdir log/solr
+
 Once your configuration is correct, you can start Solr. Of course, you need a java installation.
 
     $ cd plugins/tjSolrDoctrineBehaviorPlugin/lib/vendor/solr
@@ -71,18 +75,11 @@ On a debian server :
     $ chmod 755 /etc/init.d/solr
     $ update-rc.d solr defaults
 
-Before running Solr, just set the PROJECT_NAME value to your symfony project directory at the top of your solr script.
+Before running Solr, just set the PROJECT_NAME value to your symfony project directory at the top of your Solr script.
 
     PROJECT_NAME=mysfproject
 
 The Solr index will be created in your `data` dir, and the logs will go in `log` dir.
-You have to create one last directory before we're ready (tjSolrDoctrineBehaviorPlugin/lib/vendor/solr/logs).
-
-    $ mkdir logs/solr
-
-More logging configuration can be found in the
-`plugins/tjSolrDoctrineBehaviorPlugin/lib/vendor/solr/logging.properties` file.
-You can check out some more [documentation about logging here](http://wiki.apache.org/solr/LoggingInDefaultJettySetup).
 
 Then you can start the daemon:
 
@@ -92,6 +89,19 @@ Check this URL to be sure everything went fine.
 
 [http://localhost:8983/solr/admin/](http://localhost:8983/solr/admin/)
 
+### About logging
+
+When you start Solr, two kind of log files will be created: Solr log, and Jetty log. With the embedded installation, all logs will be created in `/var/www/youproject/log/solr`.
+Don't forget to create this directory.
+
+Solr and Jetty logging are configured in those files:
+
+    plugins/tjSolrDoctrineBehaviorPlugin/lib/vendor/solr/logging.properties
+    plugins/tjSolrDoctrineBehaviorPlugin/lib/vendor/solr/etc/jetty.xml
+
+Path are relative, so you really have to start solr from it's base directory.
+
+You can check out some more [documentation about logging here](http://wiki.apache.org/solr/LoggingInDefaultJettySetup).
 
 ## How to use ? ##
 
