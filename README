@@ -222,8 +222,51 @@ Indexing n:m relationships :
             $thrArray[] = $thread->getTitle();
       }
       return implode($thrArray, ', ');
-    }    
-    
+    }
+
+
+### Working with I18n ###
+
+This plugin comes with a simple i18n integration. Here's a quick example:
+
+    [yml]
+    Story:
+      actAs:
+        I18n:
+          fields: [ body ]
+        Solr:
+          fields: [ body ]
+
+      columns:
+        slug: string(50)
+        body:
+          type: clob
+          notnull: true
+
+The `body` field will be automaticaly indexed as many times as there are defined languages.
+Field name will be suffixed with the language in Solr. If you want to perform a search for a
+specific language, use an explicit field name in your query.
+
+    [php]
+    $story = new Story();
+    $story->slug = 'toto';
+    $story->Translation['fr']->body = 'Mon histoire';
+    $story->Translation['en']->body = 'My story';
+    $story->save();
+
+    $results = Doctrine::getTable('Post')->search('body_fr:histoire');
+    $results = Doctrine::getTable('Post')->search('body_en:story');
+    $results = Doctrine::getTable('Post')->search('sf_text_fr:histoire');
+    $results = Doctrine::getTable('Post')->search('sf_text_en:story');
+
+Notice that the default search field is a concatenation of all text fields, and it is optimized to
+work with english text. As soon as you index i18n content, you should always explicitly set the language.
+
+Notice also that for i18n fields, the fieldmap option is ignored.
+
+Only fr and en languages are configured in the given Solr schema.xml. You can find [configuration examples
+for other languages](http://code.reddit.com/browser/config/solr/schema.xml).
+
 ### Connecting to Solr ###
 
 This plugins uses the default Solr connexion parameters. You can override them in the doctrine schema :
@@ -409,6 +452,8 @@ If performance matters, use the delta-import command:
 
 [http://localhost:8983/solr/dataimport?command=delta-import](http://localhost:8983/solr/dataimport?command=delta-import)
 
+Note that you have to enable the `Timestampable` template for the delta import to work.
+
 
 ### Transactions ###
 
@@ -495,7 +540,5 @@ I'd wish to thank the following persons for contributing to this plugin :
 
 Here's some ideas for further developpements:
 
-* Compatibility with the i18n behavior
 * Add geolocation search
 * add a moreLikeThis() function
-* add an option to set the default search field

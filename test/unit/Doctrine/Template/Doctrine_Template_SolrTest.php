@@ -6,7 +6,7 @@
 include_once dirname(__FILE__).'/../../../bootstrap/bootstrap.php';
 
 LimeAnnotationSupport::enable();
-$t = new lime_test(11);
+$t = new lime_test(13);
 
 // @Before
 
@@ -87,3 +87,15 @@ $handler->replay();
 
 $q = Doctrine::getTable('Post')->createSearchQuery('azerty');
 $t->ok($q instanceof Doctrine_Query);
+
+// @Test: I18n integration
+
+$story = new Story();
+$story->slug = 'toto';
+$story->Translation['fr']->body = 'Mon histoire';
+$story->Translation['en']->body = 'My story';
+$story->save();
+
+$fields = $story->getFieldsArray();
+$t->ok(array_key_exists('body_fr', $fields));
+$t->ok(array_key_exists('body_en', $fields));

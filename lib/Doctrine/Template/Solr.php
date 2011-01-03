@@ -102,19 +102,41 @@ class Doctrine_Template_Solr extends Doctrine_Template
     $document['sf_meta_class']['value'] = get_class($invoker);
     $document['sf_meta_id']['value'] = $invoker->getId();
 
+    // Should we perform specific i18n operations?
+    $isI18N = $invoker->getTable()->hasTemplate('Doctrine_Template_I18n');
+    if ($isI18N)
+    {
+        $langs = $invoker->Translation->getKeys();
+        $translatedFields = $invoker->Translation->getFirst()->getTable()->getFieldNames();
+    }
+
     // Set others fields
     $fields = $this->_options['fields'];
     $map = $this->_options['fieldmap'];
     $boost = $this->_options['boost'];
     foreach($fields as $field)
     {
-      $fieldName = array_key_exists($field, $map) ? $map[$field] : $field;
       $fieldBoost = array_key_exists($field, $boost) ? $boost[$field] : 1;
 
-      $value = $invoker->get($field);
+      // If the current field is part of the i18n table
+      if ($isI18N && in_array($field, $translatedFields))
+      {
+          foreach ($langs as $lang)
+          {
+            $fieldName = $field . '_' . $lang;
+            $value = $invoker->Translation[$lang]->get($field);
+            $document[$fieldName]['value'] = $value;
+            $document[$fieldName]['boost'] = $fieldBoost;
+          }
+      }
+      else
+      {
+        $fieldName = array_key_exists($field, $map) ? $map[$field] : $field;
+        $value = $invoker->get($field);
 
-      $document[$fieldName]['value'] = $value;
-      $document[$fieldName]['boost'] = $fieldBoost;
+        $document[$fieldName]['value'] = $value;
+        $document[$fieldName]['boost'] = $fieldBoost;
+      }
     }
 
     return $document;
