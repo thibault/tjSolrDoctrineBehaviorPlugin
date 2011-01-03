@@ -3,10 +3,18 @@ Thread:
     title: Test Thread
     Posts:
       post1:
-        title: This is a gloubigoulba title
         body: This is the body of my test thread
-
+        title: This is a gloubigoulba title
 
       post2:
-        title: Another useless post
         body: This is a gloubigoulba body
+        title: Another useless post
+
+Story:
+  s1:
+    slug: toto
+    Translation:
+      fr:
+        body: 'Mon histoire'
+      en:
+        body: 'My story'

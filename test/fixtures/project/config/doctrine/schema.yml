@@ -27,3 +27,16 @@ Post:
     Thread:
       onDelete: CASCADE
       foreignAlias: Posts
+
+Story:
+  actAs:
+    I18n:
+      fields: [ body ]
+    Solr:
+      fields: [ body ]
+
+  columns:
+    slug: string(50)
+    body:
+      type: clob
+      notnull: true
