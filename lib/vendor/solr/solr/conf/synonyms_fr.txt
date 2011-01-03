@@ -1,0 +1,2 @@
+resto, restau => restaurant
+rose,rosa
