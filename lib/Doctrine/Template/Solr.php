@@ -66,7 +66,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function getUniqueId()
   {
-    return sprintf('%s_%s', get_class($this->getInvoker()), $this->getInvoker()->getId());
+    return sprintf('%s_%s', get_class($this->getInvoker()), $this->getInvoker()->getPrimaryKey());
   }
 
   /**
@@ -100,7 +100,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
     // set meta data
     $document['sf_meta_class']['value'] = get_class($invoker);
-    $document['sf_meta_id']['value'] = $invoker->getId();
+    $document['sf_meta_id']['value'] = $invoker->getPrimaryKey();
 
     // Should we perform specific i18n operations?
     $isI18N = $invoker->getTable()->hasTemplate('Doctrine_Template_I18n');
