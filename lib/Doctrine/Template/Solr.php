@@ -169,6 +169,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function createSearchQueryTableProxy($search, $offset=0, $limit = 30, array $params = array())
   {
+    $primaryKey =  $this->getTable()->getIdentifier();
     $response = $this->getTable()->search($search, $offset, $limit, $params);
 
     $pks = array();
@@ -185,12 +186,12 @@ class Doctrine_Template_Solr extends Doctrine_Template
     {
       $q->whereIn($alias.'.id', $pks);
       // preserve score order
-      $q->addSelect(sprintf('FIELD(%s.id,%s) as field', $alias, implode(',', $pks)));
+      $q->addSelect(sprintf('FIELD(%s.%s,%s) as field', $alias, $primaryKey, implode(',', $pks)));
       $q->orderBy('field');
     }
     else
     {
-      $q->whereIn($alias.'.id', -1);
+      $q->whereIn($alias.'.'.$primaryKey, -1);
     }
 
     return $q;
