@@ -53,6 +53,7 @@ EOF;
 
     $model = $arguments['model'];
     $query = $arguments['query'];
+    $start = $options['start'];
     $limit = $options['limit'];
 
     if(!Doctrine_Core::getTable($model)->isSearchAvailable())
@@ -62,11 +63,11 @@ EOF;
 
     $this->logSection('solr', 'Running search');
 
-    $q = Doctrine_Core::getTable($model)->createSearchQuery($query, $limit);
+    $q = Doctrine_Core::getTable($model)->createSearchQuery($query, $start, $limit);
     $results = $q->fetchArray();
 
     $this->log(array(
-      sprintf('found %s results', count($results)),
+      sprintf('found %s result(s)', count($results)),
       sfYaml::dump($results, 4)
     ));
   }
