@@ -40,7 +40,7 @@ Call it with:
 
 You can also add additional parameters:
 
-  [php symfony solr:search ModelClass query --offset=5 --limit=5|INFO]
+  [php symfony solr:search ModelClass query --start=5 --limit=5|INFO]
 EOF;
   }
 
