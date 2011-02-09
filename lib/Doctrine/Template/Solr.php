@@ -106,8 +106,16 @@ class Doctrine_Template_Solr extends Doctrine_Template
     $isI18N = $invoker->getTable()->hasTemplate('Doctrine_Template_I18n');
     if ($isI18N)
     {
-        $langs = $invoker->Translation->getKeys();
-        $translatedFields = $invoker->Translation->getFirst()->getTable()->getFieldNames();
+      // Make sure we retrieve lang codes
+      $langs = array();
+      foreach($invoker->Translation->getKeys() as $key)
+      {
+        if (is_string($key))
+        {
+          $langs[] = $key;
+        }
+      }
+      $translatedFields = $invoker->Translation->getFirst()->getTable()->getFieldNames();
     }
 
     // Set others fields
@@ -121,13 +129,13 @@ class Doctrine_Template_Solr extends Doctrine_Template
       // If the current field is part of the i18n table
       if ($isI18N && in_array($field, $translatedFields))
       {
-          foreach ($langs as $lang)
-          {
-            $fieldName = $field . '_' . $lang;
-            $value = $invoker->Translation[$lang]->get($field);
-            $document[$fieldName]['value'] = $value;
-            $document[$fieldName]['boost'] = $fieldBoost;
-          }
+        foreach ($langs as $lang)
+        {
+          $fieldName = $field . '_' . $lang;
+          $value = $invoker->Translation[$lang]->get($field);
+          $document[$fieldName]['value'] = $value;
+          $document[$fieldName]['boost'] = $fieldBoost;
+        }
       }
       else
       {
@@ -193,6 +201,9 @@ class Doctrine_Template_Solr extends Doctrine_Template
     {
       $q->whereIn($alias.'.'.$primaryKey, -1);
     }
+    
+    var_dump($response)."\n";
+    echo $q->getSqlQuery()."\n";
 
     return $q;
   }
