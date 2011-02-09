@@ -24,7 +24,7 @@ class searchTask extends sfBaseTask
     $this->addOptions(array(
       new sfCommandOption('env', null, sfCommandOption::PARAMETER_REQUIRED, 'The environment', 'dev'),
       new sfCommandOption('connection', null, sfCommandOption::PARAMETER_REQUIRED, 'The connection name', null),
-      new sfCommandOption('start', null, sfCommandOption::PARAMETER_REQUIRED, 'The search offset', 0),
+      new sfCommandOption('offset', null, sfCommandOption::PARAMETER_REQUIRED, 'The search offset', 0),
       new sfCommandOption('limit', null, sfCommandOption::PARAMETER_REQUIRED, 'The search limit', 10),
       // add your own options here
     ));
@@ -40,7 +40,7 @@ Call it with:
 
 You can also add additional parameters:
 
-  [php symfony solr:search ModelClass query --start=5 --limit=5|INFO]
+  [php symfony solr:search ModelClass "query" --offset=0 --limit=10|INFO]
 EOF;
   }
 
@@ -53,7 +53,7 @@ EOF;
 
     $model = $arguments['model'];
     $query = $arguments['query'];
-    $start = $options['start'];
+    $offset = $options['offset'];
     $limit = $options['limit'];
 
     if(!Doctrine_Core::getTable($model)->isSearchAvailable())
@@ -63,7 +63,7 @@ EOF;
 
     $this->logSection('solr', 'Running search');
 
-    $q = Doctrine_Core::getTable($model)->createSearchQuery($query, $start, $limit);
+    $q = Doctrine_Core::getTable($model)->createSearchQuery($query, $offset, $limit);
     $results = $q->fetchArray();
 
     $this->log(array(
