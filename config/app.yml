@@ -1,7 +1,15 @@
 # solr default config
 all:
   solr:
-    host: "localhost"
-    port: "8983"
-    path: "/solr"
+#    models:
+#      TableName:
+#        index:
+#          host: "localhost"
+#          port: "8983"
+#          path: "/solr"
+
+    index:
+      host: "localhost"
+      port: "8983"
+      path: "/solr"
 

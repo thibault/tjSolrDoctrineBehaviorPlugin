@@ -35,11 +35,19 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
   public function setUp()
   {
+    $table = get_class($this->getInvoker());
+
     try {
       if (class_exists('sfConfig', false)) {
+        $index = sfConfig::get('app_solr_index', false);
+        $models = sfConfig::get('app_solr_models', array());
+
         foreach (array('host', 'port', 'path') as $param) {
-          if ($value = sfConfig::get('app_solr_' . $param, false)) {
-            $this->_options[$param] = $value;
+          if (!empty($models[$table]['index'][$param])) {
+            $this->_options[$param] = $models[$table]['index'][$param];
+          }
+          else if (!empty($index[$param])) {
+            $this->_options[$param] = $index[$param];
           }
         }
       }
