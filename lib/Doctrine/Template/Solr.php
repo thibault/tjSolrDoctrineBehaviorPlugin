@@ -35,6 +35,21 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
   public function setUp()
   {
+    try {
+      if (class_exists('sfConfig', false)) {
+        foreach (array('host', 'port', 'path') as $param) {
+          if ($value = sfConfig::get('app_solr_' . $param, false)) {
+            $this->_options[$param] = $value;
+          }
+        }
+      }
+    }
+    catch (Exception $e) { 
+      if (class_exists('sfContext', false) && sfContext::hasInstance()) {
+        sfContext::getInstance()->getLogger()->crit('{Doctrine_Template_Solr::setUp} Error while setting up solr : '.$e->getMessage());
+      }
+    }
+
     $searchHandler = new Search_Handler_Solr(
       $this->_options['host'],
       $this->_options['port'],

@@ -1,0 +1,7 @@
+# solr default config
+all:
+  solr:
+    host: "localhost"
+    port: "8983"
+    path: "/solr"
+
