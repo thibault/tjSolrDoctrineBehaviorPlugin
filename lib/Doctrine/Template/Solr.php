@@ -66,7 +66,7 @@ class Doctrine_Template_Solr extends Doctrine_Template
    **/
   public function getUniqueId()
   {
-    return sprintf('%s_%s', get_class($this->getInvoker()), $this->getInvoker()->getId());
+    return sprintf('%s_%s', get_class($this->getInvoker()), $this->getInvoker()->getPrimaryKey());
   }
 
   /**
@@ -100,14 +100,22 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
     // set meta data
     $document['sf_meta_class']['value'] = get_class($invoker);
-    $document['sf_meta_id']['value'] = $invoker->getId();
+    $document['sf_meta_id']['value'] = $invoker->getPrimaryKey();
 
     // Should we perform specific i18n operations?
     $isI18N = $invoker->getTable()->hasTemplate('Doctrine_Template_I18n');
     if ($isI18N)
     {
-        $langs = $invoker->Translation->getKeys();
-        $translatedFields = $invoker->Translation->getFirst()->getTable()->getFieldNames();
+      // Make sure we retrieve lang codes
+      $langs = array();
+      foreach($invoker->Translation->getKeys() as $key)
+      {
+        if (is_string($key))
+        {
+          $langs[] = $key;
+        }
+      }
+      $translatedFields = $invoker->Translation->getFirst()->getTable()->getFieldNames();
     }
 
     // Set others fields
@@ -121,13 +129,13 @@ class Doctrine_Template_Solr extends Doctrine_Template
       // If the current field is part of the i18n table
       if ($isI18N && in_array($field, $translatedFields))
       {
-          foreach ($langs as $lang)
-          {
-            $fieldName = $field . '_' . $lang;
-            $value = $invoker->Translation[$lang]->get($field);
-            $document[$fieldName]['value'] = $value;
-            $document[$fieldName]['boost'] = $fieldBoost;
-          }
+        foreach ($langs as $lang)
+        {
+          $fieldName = $field . '_' . $lang;
+          $value = $invoker->Translation[$lang]->get($field);
+          $document[$fieldName]['value'] = $value;
+          $document[$fieldName]['boost'] = $fieldBoost;
+        }
       }
       else
       {
@@ -167,8 +175,9 @@ class Doctrine_Template_Solr extends Doctrine_Template
    *
    * @return Doctrine_Query
    **/
-  public function createSearchQueryTableProxy($search, $offset=0, $limit = 30, array $params = array())
+  public function createSearchQueryTableProxy($search, $offset = 0, $limit = 30, array $params = array())
   {
+    $primaryKey =  $this->getTable()->getIdentifier();
     $response = $this->getTable()->search($search, $offset, $limit, $params);
 
     $pks = array();
@@ -183,15 +192,18 @@ class Doctrine_Template_Solr extends Doctrine_Template
 
     if($pks)
     {
-      $q->whereIn($alias.'.id', $pks);
+      $q->whereIn($alias.'.'.$primaryKey, $pks);
       // preserve score order
-      $q->addSelect(sprintf('FIELD(%s.id,%s) as field', $alias, implode(',', $pks)));
+      $q->addSelect(sprintf('FIELD(%s.%s,%s) as field', $alias, $primaryKey, implode(',', $pks)));
       $q->orderBy('field');
     }
     else
     {
-      $q->whereIn($alias.'.id', -1);
+      $q->whereIn($alias.'.'.$primaryKey, -1);
     }
+    
+    var_dump($response)."\n";
+    echo $q->getSqlQuery()."\n";
 
     return $q;
   }
